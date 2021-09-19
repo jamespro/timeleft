@@ -11,6 +11,7 @@ Show you the actual amount of useful time you have left.
   * meetings
   * travel time
   * other commitments
+  * "gray" time - time where things are going on but you could skip if you had to
 * Pull from external calendar(s), e.g.
   * Google Calendar
   * iCal
@@ -33,7 +34,6 @@ Show you the actual amount of useful time you have left.
       * Does this get set whenever you start the app?
       * Does it save the start time?
       * Have a reset button to set start time to current time?
-      * 
 
 ## Plan
 * v1: display as countdown timer
@@ -41,6 +41,8 @@ Show you the actual amount of useful time you have left.
   * as bar, going lower/shorter as time progresses to visualize the time diminishing
   * circle? although I don't like that as much
 * Plain JavaScript or React?
+  * React would make it easier to switch between layouts
+  * and to switch to a settings panel
 * Data storage? 
   * MongoDB (or Firebase)
   * LocalStorage
@@ -48,6 +50,7 @@ Show you the actual amount of useful time you have left.
   * SQL (host?)
 * Auth/login?
   * need logins for calendars?
+* Can use the todo-mvc-auth to save user settings to MongoDB (uses EJS though) 
 
 ### Plan: MVP
 * countdown timer
@@ -63,15 +66,15 @@ Show you the actual amount of useful time you have left.
 * no calendar login 
 
 ## TODO - MVP 0.1
-- [ ] Display current date and time
+- [ ] Display countdown
 - [ ] Hard-code settings
   - [ ] start of day
   - [ ] end of day
   - [ ] total break time
   - [ ] total scheduled time
-- [ ] Display countdown
 
 ## TODO - MVP 0.2
+- [ ] Display current date and time (optional)
 - [ ] Form to enter settings
 - [ ] Settings: Basic:
   - [ ] end of day
@@ -86,4 +89,9 @@ Show you the actual amount of useful time you have left.
 * maybe: show different categories of time in different colors, for example, blue for clear, red for meetings, purple for breaks that might be optional, and have these stacked, so not just your free time
 * Tech: Standalone app (Electron? React Native?)
 * Be able to have as a component on a separate dashboard
+* Different layouts?
+  * Just available time
+  * Available time plus other types of time
+  * Available time above a line, other types below the line
+* What if able to show a week? How much time for each day for 7 days?
   
