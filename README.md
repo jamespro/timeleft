@@ -30,7 +30,8 @@ Show you the actual amount of useful time you have left.
   * Storing the person's authorization
 * B) How to store these events. And when do you update your copy?
 * C) Dealing with partial time (see below)
-* D) I think there was something else
+* D) Is it draining a lot of resources to have it update every second? Change it to every minute? Or not a big deal? Or change it to every minute anyway because I don't personally need it?
+* E) I think there was something else
 * **NOTE! AS BREAKS AND MEETINGS PASS, THEY NO LONGER NEED TO BE SUBTRACTED FROM YOUR AVAILABLE TIME!!**
   * So do we need to know the start/end times of each thing that is being removed?
   * How do we remove part of the time? e.g. if it is halfway through lunch, only 30 minutes have passed but not the whole thing?
