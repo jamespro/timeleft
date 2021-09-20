@@ -12,9 +12,16 @@ for (var i = 0; i < svgs.length; i++)
 var url = urls.join(',');
 document.getElementById('graph').style.background = url;
 
-function getTimeRemaining(endtime, starttime) {
+function getTimeRemaining(endtime, starttime, breaktime, scheduledtime, optionaltime) {
   const total = Date.parse(endtime) - Date.parse(starttime);
-  const left = Date.parse(endtime) - Date.parse(new Date());
+    let left = Date.parse(endtime) - Date.parse(new Date());
+    // console.log('left:',left)
+    // console.log('breaktime:',breaktime)
+    // left = left - breaktime
+    // console.log('left:',left)
+    // if (left <= 0) {
+    //     left = 1000;
+    // }
   const seconds = Math.floor((left / 1000) % 60);
   const minutes = Math.floor((left / 1000 / 60) % 60);
   const hours = Math.floor((left / (1000 * 60 * 60)) % 24);
@@ -44,7 +51,7 @@ function initializeClock(id, endtime, starttime, endtimeAdjustment, breaktime, s
 
     function updateClock() {
         
-        const t = getTimeRemaining(endtime,starttime);
+        const t = getTimeRemaining(endtime,starttime, breaktime, scheduledtime, optionaltime);
         timetextMessage = (t.minutes + 'm usable time left');
         t.hours ? timetextMessage = ('' + t.hours + 'h ' + timetextMessage) : timetextMessage;
         timetext.innerHTML = timetextMessage;
@@ -66,7 +73,9 @@ function initializeClock(id, endtime, starttime, endtimeAdjustment, breaktime, s
   updateClock();
   const timeinterval = setInterval(updateClock, 1000);
 }
-
+function hoursToMilliseconds(hours) {
+    return hours * 60 * 60 * 1000
+}
 // const endtime = new Date(Date.parse(new Date()) + 24 * 60 * 60 * 1000); // for 24 from page load
 // Set endtime to midnight in the future:
 const endtime = new Date();
@@ -83,8 +92,8 @@ starttime.setHours(9,0,0,0); //9am
 // * scheduled time out
 // * "gray" time - time where things are going on but you could skip if you had to
 let endtimeAdjustment = 3 // make it 9pm instead of midnight. Should calculate this from a time though and convert into # hours / min / sec
-let breaktime = 4 // set the time for meals, breaks
-let scheduledtime = 0 // No meetings or things to do
-let optionaltime = 5.5 // Twitch on Sundays
+let breaktime = hoursToMilliseconds(4) // set the time for meals, breaks - in millliseconds
+let scheduledtime = hoursToMilliseconds(0) // No meetings or things to do - in millliseconds
+let optionaltime = hoursToMilliseconds(1) // Twitch on Sundays - in millliseconds
 
 initializeClock('countdown', endtime, starttime, endtimeAdjustment, breaktime, scheduledtime, optionaltime);

@@ -52,6 +52,8 @@ Show you the actual amount of useful time you have left.
       * Does it save the start time?
       * Have a reset button to set start time to current time?
 * Break up the block into hours visually. (maybe quarter-hours also?)
+* What happens when time left goes negative? Should stop counting, but a bug happened when time left is negative (cannot divide by negative)
+  * OR?? should it count up, and be adding to "overtime"? Or subtract from "overtime"? We currently don't show "overtime" so I would need to design for that.
 
 ## Plan
 * v1: display as countdown timer
@@ -90,6 +92,9 @@ Show you the actual amount of useful time you have left.
   - [x] end of day
   - [x] total break time
   - [x] total scheduled time
+- [ ] CURRENTLY DOING: passing the times as milliseconds and subtracting
+- [ ] CURRENTLY DOING: What happens when time left goes negative? Should stop counting, but a bug happened when time left is negative (cannot divide by negative)
+  - [ ] OR?? should it count up, and be adding to "overtime"? Or subtract from "overtime"? We currently don't show "overtime" so I would need to design for that.
 
 ## TODO - MVP 0.2
 - [ ] Display current date and time (optional)
