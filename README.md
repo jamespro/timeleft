@@ -23,6 +23,20 @@ Show you the actual amount of useful time you have left.
   * What is the max time to show? 
 * **NOTE! AS BREAKS AND MEETINGS PASS, THEY NO LONGER NEED TO BE SUBTRACTED FROM YOUR AVAILABLE TIME!!**
 
+### Key Technical Issues
+* A) How to get the reserved time from the person's calendar and actually multiple calendars?
+  * How technically to code this
+  * Authorization
+  * Storing the person's authorization
+* B) How to store these events. And when do you update your copy?
+* C) Dealing with partial time (see below)
+* D) I think there was something else
+* **NOTE! AS BREAKS AND MEETINGS PASS, THEY NO LONGER NEED TO BE SUBTRACTED FROM YOUR AVAILABLE TIME!!**
+  * So do we need to know the start/end times of each thing that is being removed?
+  * How do we remove part of the time? e.g. if it is halfway through lunch, only 30 minutes have passed but not the whole thing?
+* If I generate a new block for each hour of time, plus one for partial hour, it will illustrate number of hours
+  * or do this with background? SVG background? But I'd want it to scale
+
 ### Design
 * What is the total height to show/ total time is out of what?
   * Have this be a user setting
@@ -53,13 +67,6 @@ Show you the actual amount of useful time you have left.
 * Auth/login?
   * need logins for calendars?
 * Can use the todo-mvc-auth to save user settings to MongoDB (uses EJS though) 
-
-### Technical Problems to Solve
-* **NOTE! AS BREAKS AND MEETINGS PASS, THEY NO LONGER NEED TO BE SUBTRACTED FROM YOUR AVAILABLE TIME!!**
-  * So do we need to know the start/end times of each thing that is being removed?
-  * How do we remove part of the time? e.g. if it is halfway through lunch, only 30 minutes have passed but not the whole thing?
-* If I generate a new block for each hour of time, plus one for partial hour, it will illustrate number of hours
-  * or do this with background? SVG background? But I'd want it to scale
 
 ### Plan: MVP
 * countdown timer
