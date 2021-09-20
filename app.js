@@ -44,22 +44,23 @@ function initializeClock(id, endtime, starttime, endtimeAdjustment, breaktime, s
 
     function updateClock() {
         
-    const t = getTimeRemaining(endtime,starttime);
+        const t = getTimeRemaining(endtime,starttime);
+        timetextMessage = (t.minutes + 'm usable time left');
+        t.hours ? timetextMessage = ('' + t.hours + 'h ' + timetextMessage) : timetextMessage;
+        timetext.innerHTML = timetextMessage;
+        totalHeight = 100;
+        leftHeight = Math.round(t.left / t.total * 100);
+        usedHeight = 100 - leftHeight;
+        //timetext.style.height = totalHeight + 'px';
+        leftDiv.style.height = leftHeight + '%';
+        usedDiv.style.height = usedHeight + '%';
+        hoursSpan.innerHTML = ('' + t.hours).slice(-2);
+        minutesSpan.innerHTML = ('0' + t.minutes).slice(-2);
+        secondsSpan.innerHTML = ('0' + t.seconds).slice(-2);
 
-    timetext.innerHTML = ('' + t.hours + 'h ' + t.minutes + 'm usable time left');
-    totalHeight = 100;
-    leftHeight = Math.round(t.left / t.total * 100);
-    usedHeight = 100 - leftHeight;
-    //timetext.style.height = totalHeight + 'px';
-    leftDiv.style.height = leftHeight + '%';
-    usedDiv.style.height = usedHeight + '%';
-    hoursSpan.innerHTML = ('' + t.hours).slice(-2);
-    minutesSpan.innerHTML = ('0' + t.minutes).slice(-2);
-    secondsSpan.innerHTML = ('0' + t.seconds).slice(-2);
-
-    if (t.left <= 0) {
-      clearInterval(timeinterval);
-    }
+        if (t.left <= 0) {
+        clearInterval(timeinterval);
+        }
   }
 
   updateClock();
