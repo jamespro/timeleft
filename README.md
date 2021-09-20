@@ -38,6 +38,7 @@ Show you the actual amount of useful time you have left.
   * or do this with background? SVG background? But I'd want it to scale
 
 ### Design
+* Should draw this on a whiteboard and use that as the guide
 * What is the total height to show/ total time is out of what?
   * Have this be a user setting
   * What is the max time to show? 
