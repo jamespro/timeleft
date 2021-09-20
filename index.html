@@ -9,19 +9,25 @@
     <script src="app.js" defer></script>
 </head>
 <body>
+    <svg xmlns='http://www.w3.org/2000/svg' width='90' height='50'>
+        <rect width='90' height='50' fill='#cccccc' />
+        <rect width='90' height='25' fill='#ffffff' />
+    </svg>
     <h1>Time Left Today</h1>
-    <h2>Good Luck!</h2>
-    <section id="primary">
-        <div id="bar" class="total">
+    <h2>Don't let your dreams be dreams</h2>
+    <section id="graph-wrapper">
+        <div id="graph" class="total">
             <div class="used">
             </div>
             <div class="left">
             </div>
-            <span></span>
         </div>
     </section>
-    <section id="secondary">
-        <div id="clockdiv">
+    <section id="timetext-wrapper">
+        <div id="timetext"></div>
+    </section>
+    <section id="countdown-wrapper">
+        <div id="countdown">
             <div>
                 <span class="hours"></span>
                 <div class="smalltext">Hours</div>

@@ -21,6 +21,7 @@ Show you the actual amount of useful time you have left.
   * When are your breaks?
   * What commitments do you have today?
   * What is the max time to show? 
+* **NOTE! AS BREAKS AND MEETINGS PASS, THEY NO LONGER NEED TO BE SUBTRACTED FROM YOUR AVAILABLE TIME!!**
 
 ### Design
 * What is the total height to show/ total time is out of what?
@@ -34,6 +35,7 @@ Show you the actual amount of useful time you have left.
       * Does this get set whenever you start the app?
       * Does it save the start time?
       * Have a reset button to set start time to current time?
+* Break up the block into hours visually. (maybe quarter-hours also?)
 
 ## Plan
 * v1: display as countdown timer
@@ -52,11 +54,18 @@ Show you the actual amount of useful time you have left.
   * need logins for calendars?
 * Can use the todo-mvc-auth to save user settings to MongoDB (uses EJS though) 
 
+### Technical Problems to Solve
+* **NOTE! AS BREAKS AND MEETINGS PASS, THEY NO LONGER NEED TO BE SUBTRACTED FROM YOUR AVAILABLE TIME!!**
+  * So do we need to know the start/end times of each thing that is being removed?
+  * How do we remove part of the time? e.g. if it is halfway through lunch, only 30 minutes have passed but not the whole thing?
+* If I generate a new block for each hour of time, plus one for partial hour, it will illustrate number of hours
+  * or do this with background? SVG background? But I'd want it to scale
+
 ### Plan: MVP
 * countdown timer
 * hard-code values:
-  * start of day: default: 8am
-  * end of day: default: 10pm
+  * start of day: default: 9am
+  * end of day: default: 9pm
   * total break time default: 4.0 
     * lunch: 1
     * dinner: 2
@@ -66,12 +75,12 @@ Show you the actual amount of useful time you have left.
 * no calendar login 
 
 ## TODO - MVP 0.1
-- [ ] Display countdown
+- [x] Display countdown
 - [ ] Hard-code settings
-  - [ ] start of day
-  - [ ] end of day
-  - [ ] total break time
-  - [ ] total scheduled time
+  - [x] start of day
+  - [x] end of day
+  - [x] total break time
+  - [x] total scheduled time
 
 ## TODO - MVP 0.2
 - [ ] Display current date and time (optional)
@@ -82,6 +91,7 @@ Show you the actual amount of useful time you have left.
   - [ ] total scheduled time
 
 ## TODO - v2
+- [ ] Show number of hours, to the side (or top if it's horizontal)
 - [ ] Visual display: Bar with size decreasing
 - [ ] Bar height = total time (starting when??)
 
