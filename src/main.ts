@@ -5,11 +5,102 @@ console.warn(`quick goals:`);
 console.warn(`quick goals:`);
 console.warn(` get a number for "time" that we can work with`);
 
+// 1. Events data: JSON array of events. Use the Google Calendar API as an example for sample data. Must contain 9 events. One event must start and end at the same time. One event must start before the period and end within the period. One event must start and end after the period. One event must be within the period. One event must overlap with the period end. One event must overlap with another event. Every event must start on March 5, 2024.
+
+const eventsDataJSON = [
+  {
+    start: {
+      dateTime: "2024-03-05T09:00:00-05:00",
+      timeZone: "America/New_York",
+    },
+    end: {
+      dateTime: "2024-03-05T10:00:00-05:00",
+      timeZone: "America/New_York",
+    },
+  },
+  {
+    start: {
+      dateTime: "2024-03-05T10:00:00-05:00",
+      timeZone: "America/New_York",
+    },
+    end: {
+      dateTime: "2024-03-05T11:00:00-05:00",
+      timeZone: "America/New_York",
+    },
+  },
+  {
+    start: {
+      dateTime: "2024-03-05T12:00:00-05:00",
+      timeZone: "America/New_York",
+    },
+    end: {
+      dateTime: "2024-03-05T13:00:00-05:00",
+      timeZone: "America/New_York",
+    },
+  },
+  {
+    start: {
+      dateTime: "2024-03-05T14:00:00-05:00",
+      timeZone: "America/New_York",
+    },
+    end: {
+      dateTime: "2024-03-05T15:00:00-05:00",
+      timeZone: "America/New_York",
+    },
+  },
+  {
+    start: {
+      dateTime: "2024-03-05T16:00:00-05:00",
+      timeZone: "America/New_York",
+    },
+    end: {
+      dateTime: "2024-03-05T17:00:00-05:00",
+      timeZone: "America/New_York",
+    },
+  },
+  {
+    start: {
+      dateTime: "2024-03-05T18:00:00-05:00",
+      timeZone: "America/New_York",
+    },
+    end: {
+      dateTime: "2024-03-05T19:00:00-05:00",
+      timeZone: "America/New_York",
+    },
+  },
+  {
+    start: {
+      dateTime: "2024-03-05T20:00:00-05:00",
+      timeZone: "America/New_York",
+    },
+    end: {
+      dateTime: "2024-03-05T21:00:00-05:00",
+      timeZone: "America/New_York",
+    },
+  },
+  {
+    start: {
+      dateTime: "2024-03-05T22:00:00-05:00",
+      timeZone: "America/New_York",
+    },
+    end: {
+      dateTime: "2024-03-05T23:00:00-05:00",
+      timeZone: "America/New_York",
+    },
+  },
+];
+
+// 2. Events data: Fetch events. Currently coming from Google Calendar API.
+// 3. Truncate event times: Ensure all event times are clipped to the period's start and end bounaries. If an event starts before the period, change it to start at the period's start. If an event ends after the period, change it to end at the period's end.
+// 4. Merge overlapping events: Combine events that overlap into a single event to avoid double counting.
+// 5. Calculate total unavailable time: calculate the total duration of all (merged) events.
+// 6. Calculate available time: subtract the total unavailable time from the total time in the period.
+
 let actualTimeLeft = 123;
 
 // 2024-02-25T00:00:01-05:00
-const datePart = "2024-02-27";
-const datePartNextday = "2024-02-28";
+const datePart = "2024-03-05";
+const datePartNextday = "2024-03-06";
 
 const dayStart = new Date(`${datePart}T00:00:01-05:00`); // Start of the day on Feb 17, 2024, in EST
 const dayEnd = new Date(`${datePart}T23:59:59-05:00`); // End of the day on Feb 17, 2024, in EST
@@ -22,7 +113,7 @@ const lateEnd = new Date(`${datePart}T21:00:00-05:00`); // End of late on Feb 17
 
 const event1Start = new Date(`${datePart}T10:00:00.000-05:00`); // 10 AM EST
 const event1End = new Date(`${datePart}T11:00:00.000-05:00`); // 11 AM EST
-const event2Start = new Date(`${datePart}T16:30:00.000-05:00`); // 9 AM EST the next day
+const event2Start = new Date(`${datePart}T16:30:00.000-05:00`); // 4:30 PM EST the next day
 const event2End = new Date(`${datePart}T17:30:00.000-05:00`); // 9 AM EST the next day
 const event3Start = new Date(`${datePartNextday}T09:00:00.000-05:00`); // 9 AM EST the next day
 const event3End = new Date(`${datePartNextday}T10:00:00.000-05:00`); // 9 AM EST the next day
