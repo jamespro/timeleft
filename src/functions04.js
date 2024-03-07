@@ -20,20 +20,27 @@ function mergeEvents(events) {
   return merged;
 }
 
-function calculateAvailableTime(workStart, workEnd, events, currentTimeStr) {
-  let workStartTime = parseDateTime(workStart);
-  let workEndTime = parseDateTime(workEnd);
+function calculateAvailableTime(
+  periodStart,
+  periodEnd,
+  events,
+  currentTimeStr
+) {
+  let periodStartTime = parseDateTime(periodStart);
+  let periodEndTime = parseDateTime(periodEnd);
   let currentTime = parseDateTime(currentTimeStr);
-  let totalWorkMinutes = (workEndTime - workStartTime) / (1000 * 60);
-  let remainingWorkMinutes =
-    workEndTime > currentTime ? (workEndTime - currentTime) / (1000 * 60) : 0;
+  let totalPeriodMinutes = (periodEndTime - periodStartTime) / (1000 * 60);
+  let remainingPeriodMinutes =
+    periodEndTime > currentTime
+      ? (periodEndTime - currentTime) / (1000 * 60)
+      : 0;
 
   let eventTimes = events
     .map((event) => ({
-      start: Math.max(parseDateTime(event.start.dateTime), workStartTime),
-      end: Math.min(parseDateTime(event.end.dateTime), workEndTime),
+      start: Math.max(parseDateTime(event.start.dateTime), periodStartTime),
+      end: Math.min(parseDateTime(event.end.dateTime), periodEndTime),
     }))
-    .filter((event) => event.end > event.start); // Filter out events outside the workday
+    .filter((event) => event.end > event.start); // Filter out events outside the periodday
 
   let mergedEvents = mergeEvents(eventTimes.sort((a, b) => a.start - b.start));
 
@@ -42,10 +49,10 @@ function calculateAvailableTime(workStart, workEnd, events, currentTimeStr) {
     0
   );
 
-  let availableMinutes = totalWorkMinutes - totalEventMinutes;
+  let availableMinutes = totalPeriodMinutes - totalEventMinutes;
   let remainingAvailableMinutes = Math.max(
     0,
-    remainingWorkMinutes - totalEventMinutes
+    remainingPeriodMinutes - totalEventMinutes
   );
 
   return {
@@ -61,8 +68,8 @@ function calculateAvailableTime(workStart, workEnd, events, currentTimeStr) {
 }
 
 // Example usage:
-let workStart = "2024-03-17T09:00:00-05:00"; // Workday start
-let workEnd = "2024-03-17T17:00:00-05:00"; // Workday end
+let periodStart = "2024-03-17T09:00:00-05:00"; // Periodday start
+let periodEnd = "2024-03-17T17:00:00-05:00"; // Periodday end
 let currentTimeStr = new Date().toISOString(); // Current time in ISO format
 
 let eventsData = {
@@ -72,8 +79,8 @@ let eventsData = {
 };
 
 let availableTimes = calculateAvailableTime(
-  workStart,
-  workEnd,
+  periodStart,
+  periodEnd,
   eventsData.items,
   currentTimeStr
 );

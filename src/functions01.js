@@ -1,22 +1,22 @@
 function calculateFreeTimes(workStart, workEnd, meetings, currentTime) {
-  // Clip meetings to workday boundaries and merge overlaps
+  // Clip meetings to period boundaries and merge overlaps
   const clippedMeetings = meetings.map((meeting) => ({
     start: Math.max(workStart, meeting.start),
     end: Math.min(workEnd, meeting.end),
   }));
   const mergedMeetings = mergeMeetings(clippedMeetings);
 
-  // Calculate total meeting duration within the workday
+  // Calculate total meeting duration within the
   const totalMeetingTime = mergedMeetings.reduce(
     (acc, meeting) => acc + (meeting.end - meeting.start),
     0
   );
 
-  // Calculate total workday duration
-  const totalWorkdayTime = workEnd - workStart;
+  // Calculate total  duration
+  const totalTime = workEnd - workStart;
 
-  // Calculate total free time in the workday
-  const totalFreeTime = totalWorkdayTime - totalMeetingTime;
+  // Calculate total free time in the
+  const totalFreeTime = totalTime - totalMeetingTime;
 
   // Adjust work start time based on current time for remaining free time calculation
   const effectiveWorkStart = Math.max(workStart, currentTime);
@@ -29,14 +29,11 @@ function calculateFreeTimes(workStart, workEnd, meetings, currentTime) {
     return acc;
   }, 0);
 
-  // Calculate remaining workday duration from current time
-  const remainingWorkdayTime = workEnd - effectiveWorkStart;
+  // Calculate remaining  duration from current time
+  const remainingTime = workEnd - effectiveWorkStart;
 
-  // Calculate remaining free time in the workday
-  const remainingFreeTime = Math.max(
-    0,
-    remainingWorkdayTime - remainingMeetingTime
-  ); // Ensure non-negative result
+  // Calculate remaining free time in the
+  const remainingFreeTime = Math.max(0, remainingTime - remainingMeetingTime); // Ensure non-negative result
 
   // Return both total and remaining free times
   return {

@@ -21,19 +21,19 @@ function mergeMeetings(meetings) {
   return merged;
 }
 
-function calculateFreeTime(workStart, workEnd, meetings) {
-  // Convert workday start and end to minutes
-  const workDayStart = workStart.hour * 60 + workStart.minute;
-  const workDayEnd = workEnd.hour * 60 + workEnd.minute;
-  const workDayDuration = workDayEnd - workDayStart;
+function calculateAvailableTime(periodStart, periodEnd, meetings) {
+  // Convert thisperiod start and end to minutes
+  const thisperiodStart = periodStart.hour * 60 + periodStart.minute;
+  const thisperiodEnd = periodEnd.hour * 60 + periodEnd.minute;
+  const thisperiodDuration = thisperiodEnd - thisperiodStart;
 
   // Normalize and merge meetings
   const normalizedMeetings = meetings.map((meeting) => ({
     start: Math.max(
-      workDayStart,
+      thisperiodStart,
       meeting.start.hour * 60 + meeting.start.minute
     ),
-    end: Math.min(workDayEnd, meeting.end.hour * 60 + meeting.end.minute),
+    end: Math.min(thisperiodEnd, meeting.end.hour * 60 + meeting.end.minute),
   }));
   const mergedMeetings = mergeMeetings(normalizedMeetings);
 
@@ -43,13 +43,13 @@ function calculateFreeTime(workStart, workEnd, meetings) {
     0
   );
 
-  // Subtract total meeting duration from workday duration to get free time
-  return workDayDuration - totalMeetingDuration;
+  // Subtract total meeting duration from thisperiod duration to get available time
+  return thisperiodDuration - totalMeetingDuration;
 }
 
 // Example usage
-const workStart = { hour: 9, minute: 0 };
-const workEnd = { hour: 17, minute: 0 };
+const periodStart = { hour: 9, minute: 0 };
+const periodEnd = { hour: 17, minute: 0 };
 const meetings = [
   { start: { hour: 8, minute: 30 }, end: { hour: 10, minute: 30 } },
   { start: { hour: 11, minute: 0 }, end: { hour: 12, minute: 0 } },
@@ -57,5 +57,5 @@ const meetings = [
   { start: { hour: 15, minute: 0 }, end: { hour: 16, minute: 0 } },
 ];
 
-const freeTime = calculateFreeTime(workStart, workEnd, meetings);
-console.log(`Free time in minutes: ${freeTime}`); // Outputs the free time in minutes
+const availableTime = calculateAvailableTime(periodStart, periodEnd, meetings);
+console.log(`Available time in minutes: ${availableTime}`); // Outputs the available time in minutes
