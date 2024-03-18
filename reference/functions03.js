@@ -1,3 +1,11 @@
+// list name of functions:
+// parseAndFilterEvents
+// mergeOverlappingEvents
+// calculateAvailableTime
+// getMinutesSinceMidnight
+// calculateFreeTime
+// calculateFreeTimes
+
 function parseAndFilterEvents(items, periodStartTime, periodEndTime) {
   return items
     .map((event) => {

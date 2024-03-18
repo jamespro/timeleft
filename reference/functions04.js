@@ -1,3 +1,16 @@
+// list of functions:
+// parseDateTime
+// mergeEvents
+// calculateAvailableTime
+
+// outline what calculateAvailableTime does
+// it takes in a period start, end, and an array of events
+// it returns the amount of time available in minutes
+// what other functions does calculateAvailableTime depend on?
+// it depends on parseDateTime
+// it depends on mergeEvents
+// it depends on calculateAvailableTime
+
 function parseDateTime(dateTimeStr) {
   return new Date(dateTimeStr);
 }

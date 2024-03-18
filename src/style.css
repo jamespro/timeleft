@@ -58,7 +58,10 @@ h1 {
 .card {
   padding: 2em;
 }
-
+.debug {
+  font-size:0.7em;
+  margin:0;
+}
 .footer-text {
   color: #888;
 }

@@ -1,3 +1,7 @@
+// List of functions:
+// calculateAvailableTime
+// mergeMeetings
+
 function mergeMeetings(meetings) {
   // Sort meetings by start time
   meetings.sort((a, b) => a.start - b.start);

@@ -1,6 +1,5 @@
 import "@js-temporal/polyfill";
 import "./style.css";
-import { setupCounter } from "./counter.ts";
 console.warn(`quick goals:`);
 console.warn(`quick goals:`);
 console.warn(` get a number for "time" that we can work with`);
@@ -99,8 +98,8 @@ const eventsDataJSON = [
 let actualTimeLeft = 123;
 
 // 2024-02-25T00:00:01-05:00
-const datePart = "2024-03-06";
 const datePartNextday = "2024-03-07";
+const datePart = "2024-03-06";
 
 const dayStart = new Date(`${datePart}T00:00:01-05:00`); // Start of the day on Feb 17, 2024, in EST
 const dayEnd = new Date(`${datePart}T23:59:59-05:00`); // End of the day on Feb 17, 2024, in EST
@@ -222,5 +221,3 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = /* html */ `
     </div>
   </div>
 `;
-
-setupCounter(document.querySelector<HTMLButtonElement>("#counter")!);

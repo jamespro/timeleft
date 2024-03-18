@@ -1,3 +1,6 @@
+// list of functions:
+// calculateFreeTimes
+
 function calculateFreeTimes(workStart, workEnd, meetings, currentTime) {
   // Clip meetings to period boundaries and merge overlaps
   const clippedMeetings = meetings.map((meeting) => ({
