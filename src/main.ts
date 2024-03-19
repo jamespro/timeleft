@@ -280,14 +280,37 @@ const formattedDuration = formatDuration(durationUntilPeriodEnd);
 console.log(`Time until periodEnd: ${formattedDuration}`);
 
 console.log(
-  `Time until periodEnd: ${timeUntilPeriodEnd.hours} hours, ${timeUntilPeriodEnd.minutes} minutes, and ${timeUntilPeriodEnd.seconds} seconds.`
+  `TimeLeft: ${timeUntilPeriodEnd.hours} hours, ${timeUntilPeriodEnd.minutes} minutes, and ${timeUntilPeriodEnd.seconds} seconds.`
 );
+
+// let displayTimeLeft = `${timeUntilPeriodEnd.hours} hours, ${timeUntilPeriodEnd.minutes} minutes, and ${timeUntilPeriodEnd.seconds} seconds.`;
+let displayTimeLeft = formatTimeLeft(timeUntilPeriodEnd);
+
+function formatTimeLeft(duration: {
+  hours: number;
+  minutes: number;
+  seconds: number;
+}) {
+  return `${
+    duration.hours > 0
+      ? `${duration.hours} hours${
+          duration.minutes > 0 || duration.seconds > 0 ? ", " : ""
+        }`
+      : ""
+  }${
+    duration.minutes > 0
+      ? `${duration.minutes.toString().padStart(2, "0")} minutes${
+          duration.seconds > 0 ? ", and " : ""
+        }`
+      : ""
+  }${duration.seconds.toString().padStart(2, "0")} seconds`;
+}
 
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = /* html */ `
   <div class="container">
     <p>Time Left</p>
     <div class="card">
-      <h1>Time until periodEnd: ${timeUntilPeriodEnd.hours} hours, ${timeUntilPeriodEnd.minutes} minutes, and ${timeUntilPeriodEnd.seconds} seconds.</h1>
+      <h1>TimeLeft: ${displayTimeLeft}</h1>
       <h4>periodEnd ${periodEnd}</h4>
       <h4>periodStart ${periodStart}</h4>
       <h1 style="color: blue">totalScale: ${totalScale}</h1>
