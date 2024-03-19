@@ -293,17 +293,17 @@ function formatTimeLeft(duration: {
 }) {
   return `${
     duration.hours > 0
-      ? `${duration.hours} hours${
-          duration.minutes > 0 || duration.seconds > 0 ? ", " : ""
+      ? `${duration.hours}${
+          duration.minutes > 0 || duration.seconds > 0 ? ":" : ""
         }`
       : ""
   }${
     duration.minutes > 0
-      ? `${duration.minutes.toString().padStart(2, "0")} minutes${
-          duration.seconds > 0 ? ", and " : ""
+      ? `${duration.minutes.toString().padStart(2, "0")}${
+          duration.seconds > 0 ? ":" : ""
         }`
       : ""
-  }${duration.seconds.toString().padStart(2, "0")} seconds`;
+  }${duration.seconds.toString().padStart(2, "0")}`;
 }
 
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = /* html */ `
