@@ -310,18 +310,17 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = /* html */ `
   <div class="container">
     <p>Time Left</p>
     <div class="card">
-      <h1>TimeLeft: ${displayTimeLeft}</h1>
-      <h4>periodEnd ${periodEnd}</h4>
-      <h4>periodStart ${periodStart}</h4>
+      <h1>${displayTimeLeft}</h1>
       <h1 style="color: blue">totalScale: ${totalScale}</h1>
-      <h4>periodEnd: ${periodEnd}</h4>
-      <h4>timenowtime: ${timeNowTime}</h4>
       <h1 style="color: red">remainingScale: ${remainingScale}</h1>
+      <!-- <h4>periodEnd ${periodEnd}</h4>
+      <h4>periodStart ${periodStart}</h4> -->
+      <!-- <h4>timenowtime: ${timeNowTime}</h4> -->
     </div>
-    <div class="debug">
+    <div class="debug" style="display: none;">
       <p>debug periods: ${debugPeriods}</p>
       <p>debug period names: ${debugPeriodNames}</p>
-    <p>Time Now: ${currentTime}</p>
+      <p>Time Now: ${currentTime}</p>
       <p>${periodEnd} - ${periodStart}</p>
       <p>NEXT THING STARTS AT WHEN??:</p>
       <p>Time Left: ${actualTimeLeft}</p>
