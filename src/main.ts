@@ -230,10 +230,64 @@ let currentTime = 0;
 let actualTimeLeft = 0;
 let timeLeft = 0;
 
+// calculate the totalScale which is the positive duration of time between periodEnd and periodStart in seconds;
+totalScale = Temporal.Duration.from(periodStart.until(periodEnd)).total(
+  "seconds"
+);
+// calculate the remainingScale which is the positive duration of time between nowTime and periodEnd in seconds;
+remainingScale = Temporal.Duration.from(nowTime.until(periodEnd)).total(
+  "seconds"
+);
+function getTimeUntilPeriodEnd(periodEnd: Temporal.PlainTime) {
+  // Get the current time in the same timezone as periodEnd
+  const now = Temporal.Now.plainTimeISO();
+
+  // Calculate the difference between now and periodEnd
+  let difference = periodEnd.since(now);
+
+  // Check if the periodEnd is already passed, adjust according to your needs
+  // if (Temporal.PlainTime.compare(periodEnd, now) === -1) {
+  //   console.log('periodEnd is in the past. Adjusting to next day or handling accordingly.');
+  //   // You might want to adjust this part based on how you handle periodEnd in the past.
+  //   // For example, to calculate the time until periodEnd tomorrow, you can add 24 hours to the difference.
+  //   // This is just an illustrative example.
+  //   difference = periodEnd.add({ hours: 24 }).since(now);
+  // }
+
+  // Return the time until periodEnd in hours, minutes, and seconds
+  return {
+    hours: difference.hours,
+    minutes: difference.minutes,
+    seconds: difference.seconds,
+  };
+}
+
+const timeUntilPeriodEnd = getTimeUntilPeriodEnd(periodEnd);
+function formatDuration(duration: {
+  hours: number;
+  minutes: number;
+  seconds: number;
+}) {
+  const hours = duration.hours.toString();
+  const minutes = duration.minutes.toString().padStart(2, "0");
+  const seconds = duration.seconds.toString().padStart(2, "0");
+
+  return `${hours}:${minutes}:${seconds}`;
+}
+const durationUntilPeriodEnd = getTimeUntilPeriodEnd(periodEnd);
+const formattedDuration = formatDuration(durationUntilPeriodEnd);
+
+console.log(`Time until periodEnd: ${formattedDuration}`);
+
+console.log(
+  `Time until periodEnd: ${timeUntilPeriodEnd.hours} hours, ${timeUntilPeriodEnd.minutes} minutes, and ${timeUntilPeriodEnd.seconds} seconds.`
+);
+
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = /* html */ `
   <div class="container">
     <p>Time Left</p>
     <div class="card">
+      <h1>Time until periodEnd: ${timeUntilPeriodEnd.hours} hours, ${timeUntilPeriodEnd.minutes} minutes, and ${timeUntilPeriodEnd.seconds} seconds.</h1>
       <h4>periodEnd ${periodEnd}</h4>
       <h4>periodStart ${periodStart}</h4>
       <h1 style="color: blue">totalScale: ${totalScale}</h1>
