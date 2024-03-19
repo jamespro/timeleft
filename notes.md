@@ -278,3 +278,27 @@ google calendar api example with overlapping events and more data:
   ]
 }
 ```
+
+```
+// Define the end time
+const lateEnd = Temporal.PlainTime.from("22:59:59");
+
+// Get the current zoned date time
+const now = Temporal.Now.zonedDateTimeISO();
+
+// Extract the plain time from the current zoned date time
+const nowTime = now.toPlainTime();
+
+// Compare the current time with the late end time
+const comparisonResult = Temporal.PlainTime.compare(nowTime, lateEnd);
+
+// Check if the current time is before the late end time
+if (comparisonResult === -1) {
+    console.log('Now is before the late end time.');
+} else if (comparisonResult === 0) {
+    console.log('Now is exactly at the late end time.');
+} else {
+    console.log('Now is after the late end time.');
+}
+
+```

@@ -1,4 +1,4 @@
-import { Temporal } from "@js-temporal/polyfill";
+import { Temporal } from "temporal-polyfill";
 import "./style.css";
 
 // 1. Determine period start and end dates and times. The full day starts at 00:00:00 and ends at 23:59:59. The "early" period starts at 07:00:00 and ends at 08:59:59. The "late" period starts at 17:00:00 and ends at 21:59:59. The "prime" period of work starts at 09:00:00 and ends at 16:59:59. The current period will be passed into the functions that calculate the times. Every time the times are calculated, the current time will change the period start and end times that are passed into the functions. If it is before the "early" period start time, then the period start time will be set to 00:00:00 and the period end time will be set to 07:59:59. So, if it is after the "early" period start time, but before the "early" period end time, then the period start time will be set to 07:00:00 and the period end time will be set to 08:59:59. If it is after the "prime" period start time, but before the "prime" period end time, then the period start time will be set to 09:00:00 and the period end time will be set to 16:59:59. If it is after the "late" period start time, but before the "late" period end time, then the period start time will be set to 17:00:00 and the period end time will be set to 21:59:59. If it is after the "late" period end time, then the period start time will be set to 22:00:00 and the period end time will be set to 23:59:59.
@@ -17,29 +17,6 @@ import "./style.css";
 // prime
 // late
 
-/*
-// set the variables for all of the periods and start and end times in javascript:
-const timePeriods = ["early", "prime", "late"]; // set the variables for all of the periods and start and end times in javascript:
-
-function getCurrentTime() {
-  const date = new Date();
-  const hour = date.getHours();
-  const minute = date.getMinutes();
-  const second = date.getSeconds();
-  return `${hour}:${minute}:${second}`;
-}
-
-function getCurrentDate() {
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = date.getMonth() + 1;
-  const day = date.getDate();
-  return `${year}-${month.toString().padStart(2, "0")}-${day
-    .toString()
-    .padStart(2, "0")}`;
-}
-
-*/
 const currentDate = new Date();
 
 const currentMonth = (currentDate.getMonth() + 1).toString().padStart(2, "0");

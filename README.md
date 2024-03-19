@@ -95,16 +95,64 @@ Show you the actual amount of useful time you have left.
 
 ## TODO - MVP 0.1
 
+_IS THERE A DIFFERENT WAY TO CALCULATE THESE? AN ALGORITHM?_
+_MAKE AN ARRAY OR DATA STRUCTURE THAT ACCUMULATES THE TIMES, THAT MERGES ANY OVERLAPPINGntheCa_
+
 - [x] Display countdown
 - [ ] Hard-code settings
   - [x] start of day
   - [x] end of day
   - [x] total break time
   - [x] total scheduled time
-- [ ] NOTE: USING GOOGLE CALENDAR API FORMAT (TO START)
-- [ ] passing the times as milliseconds and subtracting?
-- [ ] What happens when time left goes negative? Should stop counting, but a bug happened when time left is negative (cannot divide by negative)
-  - [ ] OR?? should it count up, and be adding to "overtime"? Or subtract from "overtime"? We currently don't show "overtime" so I would need to design for that.
+- [ ] Smaller steps:
+  - [ ] calc/show:
+    - [ ] totalTime = periodEnd - periodStart
+      - //NOTE: "period" = the SCALE which also = "totalTime". "period" does not start from "now"
+      - [ ] periodEnd = dayEnd, then lateEnd, then workEnd
+        - if now > that End, use the next End
+        - //NOTE: \* (perodEnd is never earlier than workEnd)
+    - [ ] passedTime = now - periodStart
+    - [ ] availableTime = totalTime - passedTime
+      - _EVERYTHING IS SUBTRACTED FROM TOTALTIME_
+      - subtract time elapsed since start //(now to periodEnd)
+    - [ ] percentAvailable = availableTime/totalTime
+      - so now we have the scale and we can show it relative to the total
+    - [ ] unavailableTime = sum of time of all events during period
+      - that start before periodEnd
+      - that do not end before periodStart
+      - _for each Event, you'll subtract any time that is before periodStart or after periodEnd_
+      - ?: _subtract any time before "now"?_
+    - [ ] then subtract Event1
+      - TestEvent is always in the future
+    - RULES TO INCLUDE AN EVENT'S TIME IN THE CALC
+      - [ ] RULE: start is before period END; end is after period START - it must start BEFORE the end, and it must end AFTER it starts
+        - ^^^ THIS RULE WILL TAKE CARE OF THESE CASES BELOW, RIGHT?
+          - [ ] start and end are both before period start - exclude
+          - [ ] start and end are both after period end - exclude
+    - [ ] EXAMPLE EVENTS
+      - [ ] "TOO EARLY" - start and end are both before period start - exclude
+      - [ ] "TOO LATE" - start and end are both after period end - exclude
+      - [ ] "DURING" - start is after period start; end is before period end - subtract
+      - [ ] "DURING FUTURE" - simplest: start and end are both after now (in the future) and both after period start and before period end (and do not overlap)
+      - [ ] "DURING PAST" - start and end are both in this period before now
+      - [ ] "DURING OVERLAP START"
+      - [ ] "DURING OVERLAP END"
+      - CASES involving "NOW"
+      - [ ] "DURING OVERLAP NOW"
+      - [ ] - start before now
+      - [ ] - start before now; end after period
+    - [ ] SPECIAL CASES
+      - [ ] If EventEnd has passed, do not subtract EventTime
+      - [ ] what if Event has already started - and not passed
+        - subtract: now - eventStart from totalTime
+      - [ ] _WHAT IF TWO EVENTS OVERLAP?_
+- USING GOOGLE CALENDAR API FORMAT (TO START)
+- ?: passing the times as milliseconds and subtracting?
+- ?: What happens when time left goes negative? Should stop counting, but a bug happened when time left is negative (cannot divide by negative)
+  - ?: OR?? should it count up, and be adding to "overtime"? Or subtract from "overtime"? We currently don't show "overtime" so I would need to design for that.
+- IDEA: DISPLAY: What if you just have two rectangles of size = totalTime, but rectangle 2 moves down or "starts" at the current time. Then at the end (bottom), either it moves off the viewable area, or the color is different because it's no longer overlapping rectangle 1 (the totalTime), making the "used up time" look different.
+  - you still need to calculate the periodTime, and have a way to know where to start "now"
+  - it doesn't take "unavailableTime" into account (like meetings or lunch) - you would still need to calculate rectangle 2 size separately
 
 ## TODO - MVP 0.2
 
@@ -131,3 +179,56 @@ Show you the actual amount of useful time you have left.
   - Available time plus other types of time
   - Available time above a line, other types below the line
 - What if able to show a week? How much time for each day for 7 days?
+
+# Log
+
+## 2024-03-18
+
+### Status
+
+#### Date/Time functions
+
+- Temporal: temporal-polyfill
+- now as ZonedDateTimeISO
+- nowTime is PlainTime - from now (so not a new time)
+- nowTimeZone
+
+#### Event Data
+
+- eventsDataJSON
+  - not using this yet, it's empty
+
+#### Periods
+
+- start and end times are set
+  - PlainTime
+- periodStart, periodEnd defaults to day
+- [ ] ?? MUST BE SOME COMPARE FUNCTION in TEMPORAL??? INSTEAD OF since / until??
+- DURATION - SINCE / UNTIL - work to compare
+  - and TOTAL to convert to "seconds" / "milliseconds
+- [ ] adjustPeriods - its own function?
+- [ ] what should it take as params? and output?
+- [ ] after output, needs to set the values right?
+  - like it shouldn't update periods inside the function, it should be outside??
+  - return an object?
+  - periods = { "periodStart": "17:00:00", "periodEnd": "22:59:59" }
+  - OR ARE THEY SUPPOSED TO BE Temporal.PlainTime ??
+
+### Timer / updating
+
+- tick function
+- call itself using setTimeout 100ms (NOT SETINTERVAL)
+- updates time left on all timers
+- & checks if a timer has expired
+
+### NEW! Added / updated
+
+- use `now.toPlainTime();` instead
+
+#### Checklist
+
+- [ ] check console
+- [ ] Today's date being used?
+- [ ] current periodStart correct?
+- [ ] current periodEnd correct?
+- [ ] duration time now until periodEnd? DISPLAY IT

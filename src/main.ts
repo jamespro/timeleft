@@ -13,7 +13,7 @@ console.info(`now: ${now}`);
 
 // variable, using now, get the PlainTime object that will be used in all future calculations in the program:
 
-const nowTime = Temporal.PlainTime.from(now);
+const nowTime = now.toPlainTime();
 // console log the variable with the variable name and value:
 
 console.info(`nowTime: ${nowTime}`);
@@ -148,222 +148,51 @@ console.warn(`primeStart:${primeStart.toString()}`);
 // Primary goal right now: Is the time now in the prime period? If so, use primeStart and primeEnd. If not, use lateEnd and dayEnd.
 // Subgoal: What is the duration of time in total seconds from now until primeStart? Determine this using Temporal API:
 
-console.log("Since:");
-console.warn(
-  `periodStart since now: ${Temporal.Duration.from(
-    periodStart.since(now)
-  ).total("seconds")}`
-);
-console.warn(
-  `periodEnd since now: ${Temporal.Duration.from(periodEnd.since(now)).total(
-    "seconds"
-  )}`
-);
-console.warn(
-  `dayStart since now: ${Temporal.Duration.from(dayStart.since(now)).total(
-    "seconds"
-  )}`
-);
-console.warn(
-  `earlyStart since now: ${Temporal.Duration.from(earlyStart.since(now)).total(
-    "seconds"
-  )}`
-);
-console.warn(
-  `earlyEnd since now: ${Temporal.Duration.from(earlyEnd.since(now)).total(
-    "seconds"
-  )}`
-);
-console.warn(
-  `primeStart since now: ${Temporal.Duration.from(primeStart.since(now)).total(
-    "seconds"
-  )}`
-);
-console.warn(
-  `primeEnd since now: ${Temporal.Duration.from(primeEnd.since(now)).total(
-    "seconds"
-  )}`
-);
-console.warn(
-  `lateStart since now: ${Temporal.Duration.from(lateStart.since(now)).total(
-    "seconds"
-  )}`
-);
-console.warn(
-  `lateEnd since now: ${Temporal.Duration.from(lateEnd.since(now)).total(
-    "seconds"
-  )}`
-);
-console.warn(
-  `dayEnd since now: ${Temporal.Duration.from(dayEnd.since(now)).total(
-    "seconds"
-  )}`
-);
-
-console.log("Until:");
-console.warn(
-  `periodStart until now: ${Temporal.Duration.from(
-    periodStart.until(now)
-  ).total("seconds")}`
-);
-console.warn(
-  `periodEnd until now: ${Temporal.Duration.from(periodEnd.until(now)).total(
-    "seconds"
-  )}`
-);
-console.warn(
-  `dayStart until now: ${Temporal.Duration.from(dayStart.until(now)).total(
-    "seconds"
-  )}`
-);
-console.warn(
-  `earlyStart until now: ${Temporal.Duration.from(earlyStart.until(now)).total(
-    "seconds"
-  )}`
-);
-console.warn(
-  `earlyEnd until now: ${Temporal.Duration.from(earlyEnd.until(now)).total(
-    "seconds"
-  )}`
-);
-console.warn(
-  `primeStart until now: ${Temporal.Duration.from(primeStart.until(now)).total(
-    "seconds"
-  )}`
-);
-console.warn(
-  `primeEnd until now: ${Temporal.Duration.from(primeEnd.until(now)).total(
-    "seconds"
-  )}`
-);
-console.warn(
-  `lateStart until now: ${Temporal.Duration.from(lateStart.until(now)).total(
-    "seconds"
-  )}`
-);
-console.warn(
-  `lateEnd until now: ${Temporal.Duration.from(lateEnd.until(now)).total(
-    "seconds"
-  )}`
-);
-console.warn(
-  `dayEnd until now: ${Temporal.Duration.from(dayEnd.until(now)).total(
-    "seconds"
-  )}`
-);
-
-// Subgoal: Is the duration of time from now until primeStart a negative number?
-// Subgoal: If so, set periodStart to primeStart.
-
-// Subgoal: Is the time from now until primeEnd a positive number?
-// Subgoal: If so, set periodEnd to primeEnd.
-
-// define a variable as the Duration since periodStart until now?
-// log periodStart and periodEnd before the function
-console.log(`periodStart: ${periodStart.toString()}`);
-console.log(`periodEnd: ${periodEnd.toString()}`);
-
 // function to get the period start and end times. pass in
 
-adjustPeriods(nowTime);
+// Array of start times to compare
+const startTimes = [dayStart, earlyStart, primeStart, lateStart];
 
-function adjustPeriods(time: Temporal.PlainTime): void {
-  // if (!(time instanceof Temporal.PlainTime)) {
-  //   console.log("time is not a Temporal.PlainTime object");
-  //   throw new Error(
-  //     "Invalid parameter: time must be a Temporal.PlainTime object"
-  //   );
-  // }
-  // if (!(earlyStart instanceof Temporal.PlainTime)) {
-  //   console.log("earlyStart is not a Temporal.PlainTime object");
-  //   throw new Error(
-  //     "Invalid parameter: earlyStart must be a Temporal.PlainTime object"
-  //   );
-  // }
+// Find the closest past time to "nowTime"
+const closestPastTime = startTimes.reduce((acc, startTime) => {
+  // If startTime is before nowTime and after the current closest time, update acc
+  if (
+    Temporal.PlainTime.compare(startTime, nowTime) === -1 &&
+    Temporal.PlainTime.compare(startTime, acc) === 1
+  ) {
+    return startTime;
+  }
+  return acc;
+}, dayStart); // Start with the earliest possible time (dayStart) and find the latest that's still before now
 
-  // adjustStart
-  // compare periodStart to earlyStart
-  // if periodStart is less than earlyStart, set periodStart to earlyStart
-  if (
-    Temporal.Duration.from(periodStart.since(now)).total("milliseconds") <
-    Temporal.Duration.from(earlyStart.since(now)).total("milliseconds")
-  ) {
-    periodStart = earlyStart;
-  }
-  // compare periodStart to primeStart
-  // if periodStart is less than primeStart, set periodStart to primeStart
-  if (
-    Temporal.Duration.from(periodStart.since(now)).total("milliseconds") <
-    Temporal.Duration.from(primeStart.since(now)).total("milliseconds")
-  ) {
-    periodStart = primeStart;
-  }
-  // compare periodStart to lateStart
-  // if periodStart is less than lateStart, set periodStart to lateStart
+// Update periodStart to the closest past time
+periodStart = closestPastTime;
 
-  if (
-    Temporal.Duration.from(periodStart.since(now)).total("milliseconds") <
-    Temporal.Duration.from(lateStart.since(now)).total("milliseconds")
-  ) {
-    periodStart = lateStart;
-  }
-  // adjustEnd
-  // compare periodEnd to earlyEnd
-  // if periodEnd is less than earlyEnd, set periodEnd to earlyEnd
-  if (
-    Temporal.Duration.from(periodEnd.until(now)).total("milliseconds") <
-    Temporal.Duration.from(earlyEnd.until(now)).total("milliseconds")
-  ) {
-    console.log("setting periodEnd to earlyEnd");
-    periodEnd = earlyEnd;
-  }
-  // compare periodEnd to primeEnd
-  // if periodEnd is less than primeEnd, set periodEnd to primeEnd
-  if (
-    Temporal.Duration.from(periodEnd.until(now)).total("milliseconds") <
-    Temporal.Duration.from(primeEnd.until(now)).total("milliseconds")
-  ) {
-    console.log("setting periodEnd to primeEnd");
-    periodEnd = primeEnd;
-  }
-  // compare periodEnd to lateEnd
-  // if periodEnd is less than lateEnd, set periodEnd to lateEnd
-
-  if (
-    Temporal.Duration.from(periodEnd.until(now)).total("milliseconds") <
-    Temporal.Duration.from(lateEnd.until(now)).total("milliseconds")
-  ) {
-    console.log("setting periodEnd to lateEnd");
-    periodEnd = lateEnd;
-  }
-
-  // if (time >= primeStart && time < primeEnd) {
-  //   periodStart = primeStart;
-  //   periodEnd = primeEnd;
-  // } else {
-  //   periodStart = lateEnd;
-  //   periodEnd = dayEnd;
-  // }
-  // if (time < earlyStart) {
-  //   periodStart = dayStart;
-  //   periodEnd = earlyEnd;
-  // } else if (time >= earlyStart && time < earlyEnd) {
-  //   periodStart = earlyStart;
-  //   periodEnd = earlyEnd;
-  // } else if (time >= primeStart && time < primeEnd) {
-  //   periodStart = primeStart;
-  //   periodEnd = primeEnd;
-  // } else if (time >= lateStart && time < lateEnd) {
-  //   periodStart = lateStart;
-  //   periodEnd = lateEnd;
-  // } else {
-  //   periodStart = lateEnd;
-  //   periodEnd = dayEnd;
-  // }
-}
+console.log(`The closest past time period start is: ${periodStart}`);
 
 // log periodStart and periodEnd to the console for debugging:
 console.log(`AFTER periodStart: ${periodStart.toString()}`);
+
+// Array of end times to compare
+const endTimes = [earlyEnd, primeEnd, lateEnd, dayEnd];
+
+// Find the closest future time to "nowTime"
+const closestFutureTime = endTimes.reduce((acc, endTime) => {
+  // If endTime is after nowTime and before the current closest time, update acc
+  if (
+    Temporal.PlainTime.compare(endTime, nowTime) === 1 &&
+    Temporal.PlainTime.compare(endTime, acc) === -1
+  ) {
+    return endTime;
+  }
+  return acc;
+}, dayEnd); // Start with the latest possible time (dayEnd) and find the earliest that's still after now
+
+// Update periodEnd to the closest future time
+periodEnd = closestFutureTime;
+
+console.log(`The closest future time period end is: ${periodEnd}`);
+
 console.log(`AFTER periodEnd: ${periodEnd.toString()}`);
 
 // create a variable to include below to output the value for all of the variable names for the periods, for debugging:
