@@ -273,9 +273,6 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = /* html */ `
     <div class="debug" style="display: none;">
       <h4 style="color: blue">totalScale: ${totalScale}</h4>
       <h4 style="color: red">remainingScale: ${remainingScale}</h4>
-      <!-- <h4>periodEnd ${periodEnd}</h4>
-      <h4>periodStart ${periodStart}</h4> -->
-      <!-- <h4>timenowtime: ${timeNowTime}</h4> -->
       <p>Time Now: ${currentTime}</p>
       <p>${periodEnd} - ${periodStart}</p>
       <p>NEXT THING STARTS AT WHEN??:</p>

@@ -19,5 +19,5 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "reference/main01.ts", "reference"]
+  "include": ["src"]
 }

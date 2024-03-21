@@ -182,7 +182,41 @@ _MAKE AN ARRAY OR DATA STRUCTURE THAT ACCUMULATES THE TIMES, THAT MERGES ANY OVE
 
 # Log
 
+## 2024-03-20
+
+### Which next step today?
+
+_FUNCTION OVER LOOKS (right now)_
+
+- SUBTRACTING EVENT TIME??
+- tick
+- - ACTUAL EVENTS from Google Calendar?
+- layout: center, color, size
+- Refactoring? (see other list)
+- hosting: put it live, where? fly.io? vercel? replace Vercel app (no that's a T3 app)
+- T3 app-- just put this code onto the T3 app?? because that can just be live already
+- multiple timers? early, prime, late, after, and they all go down to nothing?
+
+#### Refactoring list
+
+- Refactor code... separate files & importing?
+- Refactor code... use functions better?
+- Refactor code... templating? Svelte? T3?
+- Refactor code... JSDoc? take out, leave in?
+
+## 2024-03-19
+
+### Status
+
+- now have vertical time gauge with time live in the current period
+- and display time left in hh:mm:ss
+
 ## 2024-03-18
+
+### NEXT
+
+- [ ] tick function to update the time and gauge
+- [ ] design (larger, adjust to screen size, dark mode or leave light mode?)
 
 ### Status
 
