@@ -184,6 +184,12 @@ _MAKE AN ARRAY OR DATA STRUCTURE THAT ACCUMULATES THE TIMES, THAT MERGES ANY OVE
 
 ## 2024-03-20
 
+### tick: thinking
+
+- do I need to reorganize the code or maybe not?
+- on tick, what needs to happen?
+  - re-run... basically the entire thing
+
 ### Which next step today?
 
 _FUNCTION OVER LOOKS (right now)_
