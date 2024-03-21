@@ -252,8 +252,10 @@ remainingScale = Temporal.Duration.from(nowTime.until(periodEnd)).total(
   "seconds"
 );
 
+//FIXME: these are the same thing! And are they the same purpose as remainingScale?
 const timeUntilPeriodEnd = getTimeUntilPeriodEnd(periodEnd);
 const durationUntilPeriodEnd = getTimeUntilPeriodEnd(periodEnd);
+
 const formattedDuration = formatDuration(durationUntilPeriodEnd);
 
 console.log(`Time until periodEnd: ${formattedDuration}`);
@@ -263,6 +265,21 @@ console.log(
 );
 
 let displayTimeLeft = formatTimeLeft(timeUntilPeriodEnd);
+
+function updateDisplayTimeLeft() {
+  displayTimeLeft = formatTimeLeft(timeUntilPeriodEnd);
+}
+
+// new function to update every 100 milliseconds using setTimeout. Will updateGauge, updateDisplayTimeLeft.
+// using setTimeout, will not use setInterval
+function refresh() {
+  setTimeout(() => {
+    //updateGauge expects 2 arguments:
+    updateGauge(totalScale, remainingScale);
+    updateDisplayTimeLeft();
+    refresh();
+  }, 19000);
+}
 
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = /* html */ `
   <div class="container">
@@ -290,3 +307,4 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = /* html */ `
 `;
 
 updateGauge(totalScale, remainingScale);
+refresh();
