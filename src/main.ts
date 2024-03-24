@@ -4,12 +4,6 @@ import "./style.css";
 //NOTE: USE JavaScript Temporal API for all dates and calculations. USE Google Calendar API format for dates. USE ISO 8601 format for time.
 
 //Functions for calculating time left
-/**
- * Calculates the time available until a specified period end time.
- *
- * @param {Temporal.PlainTime} periodEnd - The end time of the period
- * @return {Object} An object containing the available hours, minutes, and seconds
- */
 function getDurationUntilPlainTime(time: Temporal.PlainTime): {
   hours: number;
   minutes: number;
@@ -25,15 +19,7 @@ function getDurationUntilPlainTime(time: Temporal.PlainTime): {
     seconds: difference.seconds,
   };
 }
-/**
- * Formats a duration object into a string representation of the duration in hours, minutes, and seconds.
- *
- * @param {object} duration - The duration object to be formatted.
- * @param {number} duration.hours - The number of hours in the duration.
- * @param {number} duration.minutes - The number of minutes in the duration.
- * @param {number} duration.seconds - The number of seconds in the duration.
- * @return {string} A string representation of the duration in the format "HH:MM:SS".
- */
+
 function formatDuration(duration: {
   hours: number;
   minutes: number;
@@ -46,12 +32,6 @@ function formatDuration(duration: {
   return `${hours}:${minutes}:${seconds}`;
 }
 
-/**
- * Formats the time left based on the duration object.
- *
- * @param {{ hours: number; minutes: number; seconds: number; }} duration - The duration object containing hours, minutes, and seconds.
- * @return {string} The formatted time left in hh:mm:ss format.
- */
 function formatTimeLeft(duration: {
   hours: number;
   minutes: number;
@@ -71,13 +51,7 @@ function formatTimeLeft(duration: {
       : ""
   }${duration.seconds.toString().padStart(2, "0")}`;
 }
-/**
- * Update the gauge to visually represent the available time compared to the total time.
- *
- * @param {number} totalScale - the total scale of the gauge
- * @param {number} availableScale - the available scale of the gauge
- * @return {void}
- */
+
 function updateGauge(totalScale: number, availableScale: number) {
   const proportion = (availableScale / totalScale) * 100;
   const gauge = document.getElementById("timeGauge");
@@ -202,41 +176,57 @@ let periodEnd = dayEnd;
 // console.warn(`nowTime: ${nowTime.toString()}`);
 // 3a. start time
 // Put the start times into an array to loop through and compare
+
 const startTimes = [dayStart, earlyStart, primeStart, lateStart];
 
-// Find the closest past time to "nowTime"
-const closestPastTime = startTimes.reduce((acc, startTime) => {
-  // If startTime is before nowTime and after the current closest time, update acc
-  if (
-    Temporal.PlainTime.compare(startTime, nowTime) === -1 &&
-    Temporal.PlainTime.compare(startTime, acc) === 1
-  ) {
-    return startTime;
-  }
-  return acc;
-}, dayStart); // Start with the earliest possible time (dayStart) and find the latest that's still before now
-
 // Update periodStart to the closest past time
-periodStart = closestPastTime;
+function getPeriodStart(
+  nowTime: Temporal.PlainTime,
+  startTimes: Temporal.PlainTime[]
+) {
+  const closestPastTime = startTimes.reduce((acc, startTime) => {
+    // If startTime is before nowTime and after the current closest time, update acc
+    if (
+      Temporal.PlainTime.compare(startTime, nowTime) === -1 &&
+      Temporal.PlainTime.compare(startTime, acc) === 1
+    ) {
+      return startTime;
+    }
+    return acc;
+  }, dayStart);
+
+  periodStart = closestPastTime;
+  return periodStart;
+}
+periodStart = getPeriodStart(nowTime, startTimes);
 
 // 3b. end time
 // Put the end times into an array to loop through and compare
 const endTimes = [earlyEnd, primeEnd, lateEnd, dayEnd];
 
-// Find the closest future time to "nowTime"
-const closestFutureTime = endTimes.reduce((acc, endTime) => {
-  // If endTime is after nowTime and before the current closest time, update acc
-  if (
-    Temporal.PlainTime.compare(endTime, nowTime) === 1 &&
-    Temporal.PlainTime.compare(endTime, acc) === -1
-  ) {
-    return endTime;
-  }
-  return acc;
-}, dayEnd); // Start with the latest possible time (dayEnd) and find the earliest that's still after now
+function getPeriodEnd(
+  nowTime: Temporal.PlainTime,
+  endTimes: Temporal.PlainTime[]
+) {
+  // Find the closest future time to "nowTime"
+  const closestFutureTime = endTimes.reduce((acc, endTime) => {
+    // If endTime is after nowTime and before the current closest time, update acc
+    if (
+      Temporal.PlainTime.compare(endTime, nowTime) === 1 &&
+      Temporal.PlainTime.compare(endTime, acc) === -1
+    ) {
+      return endTime;
+    }
+    return acc;
+  }, dayEnd); // Start with the latest possible time (dayEnd) and find the earliest that's still after now
+
+  // Update periodEnd to the closest future time
+  periodEnd = closestFutureTime;
+  return periodEnd;
+}
 
 // Update periodEnd to the closest future time
-periodEnd = closestFutureTime;
+periodEnd = getPeriodEnd(nowTime, endTimes);
 
 console.warn(`periodStart: ${periodStart.toString()}`);
 console.warn(`periodEnd: ${periodEnd.toString()}`);
@@ -254,21 +244,12 @@ availableScale = Temporal.Duration.from(nowTime.until(periodEnd)).total(
   "seconds"
 );
 
-//FIXME: these are the same thing! And are they the same purpose as availableScale?
 const durationUntilPeriodEnd = getDurationUntilPlainTime(periodEnd);
 
 // console.log(`Time until periodEnd: ${formattedDuration}`);
 
 let timeLeftDisplay = formatTimeLeft(durationUntilPeriodEnd);
 
-/**
- * Updates the time left display with the formatted duration until the end of the period.
- *
- * @param {Object} durationUntilPeriodEnd - An object containing the number of hours, minutes, and seconds until the end of the period.
- * @param {number} durationUntilPeriodEnd.hours - The number of hours until the end of the period.
- * @param {number} durationUntilPeriodEnd.minutes - The number of minutes until the end of the period.
- * @param {number} durationUntilPeriodEnd.seconds - The number of seconds until the end of the period.
- */
 function updateTimeLeftDisplay(durationUntilPeriodEnd: {
   hours: number;
   minutes: number;
@@ -287,26 +268,6 @@ function getNewTotalScale(nowTime: Temporal.PlainTime): number {
   return totalScale;
 }
 
-function getPeriodEnd(nowTime: Temporal.PlainTime) {
-  const endTimes = [earlyEnd, primeEnd, lateEnd, dayEnd];
-
-  // Find the closest future time to "nowTime"
-  const closestFutureTime = endTimes.reduce((acc, endTime) => {
-    // If endTime is after nowTime and before the current closest time, update acc
-    if (
-      Temporal.PlainTime.compare(endTime, nowTime) === 1 &&
-      Temporal.PlainTime.compare(endTime, acc) === -1
-    ) {
-      return endTime;
-    }
-    return acc;
-  }, dayEnd); // Start with the latest possible time (dayEnd) and find the earliest that's still after now
-
-  // Update periodEnd to the closest future time
-  periodEnd = closestFutureTime;
-  return periodEnd;
-}
-
 // new function to update every 100 milliseconds using setTimeout. Will updateGauge, updateDisplayTimeLeft.
 // using setTimeout, will not use setInterval
 function refresh() {
@@ -314,7 +275,8 @@ function refresh() {
     const nowTime = Temporal.Now.zonedDateTimeISO().toPlainTime();
     console.log("refreshing...");
     let totalScale = getNewTotalScale(nowTime);
-    let periodEnd = getPeriodEnd(nowTime);
+    let periodStart = getPeriodStart(nowTime, startTimes);
+    let periodEnd = getPeriodEnd(nowTime, endTimes);
     const durationUntilPeriodEnd = getDurationUntilPlainTime(periodEnd);
 
     console.log(totalScale, availableScale);
