@@ -5,10 +5,10 @@ import "./style.css";
 
 //Functions for calculating time left
 /**
- * Calculates the time remaining until a specified period end time.
+ * Calculates the time available until a specified period end time.
  *
  * @param {Temporal.PlainTime} periodEnd - The end time of the period
- * @return {Object} An object containing the remaining hours, minutes, and seconds
+ * @return {Object} An object containing the available hours, minutes, and seconds
  */
 function getDurationUntilPlainTime(time: Temporal.PlainTime): {
   hours: number;
@@ -72,19 +72,19 @@ function formatTimeLeft(duration: {
   }${duration.seconds.toString().padStart(2, "0")}`;
 }
 /**
- * Update the gauge to visually represent the remaining time compared to the total time.
+ * Update the gauge to visually represent the available time compared to the total time.
  *
  * @param {number} totalScale - the total scale of the gauge
- * @param {number} remainingScale - the remaining scale of the gauge
+ * @param {number} availableScale - the available scale of the gauge
  * @return {void}
  */
-function updateGauge(totalScale: number, remainingScale: number) {
-  const proportion = (remainingScale / totalScale) * 100;
+function updateGauge(totalScale: number, availableScale: number) {
+  const proportion = (availableScale / totalScale) * 100;
   const gauge = document.getElementById("timeGauge");
   gauge!.style.height = proportion + "%";
 
-  // Update text to show the exact time remaining/total
-  const text = `${remainingScale} seconds remaining of ${totalScale} total seconds`;
+  // Update text to show the exact time available/total
+  const text = `${availableScale} seconds available of ${totalScale} total seconds`;
   document.getElementById("timeText")!.innerText = text;
 }
 
@@ -243,18 +243,18 @@ console.warn(`periodEnd: ${periodEnd.toString()}`);
 
 // set defaults for any unused variables below:
 let totalScale = 0;
-let remainingScale = 0;
+let availableScale = 0;
 let currentTime = 0;
 let actualTimeLeft = 0;
 
 totalScale = Temporal.Duration.from(periodStart.until(periodEnd)).total(
   "seconds"
 );
-remainingScale = Temporal.Duration.from(nowTime.until(periodEnd)).total(
+availableScale = Temporal.Duration.from(nowTime.until(periodEnd)).total(
   "seconds"
 );
 
-//FIXME: these are the same thing! And are they the same purpose as remainingScale?
+//FIXME: these are the same thing! And are they the same purpose as availableScale?
 const durationUntilPeriodEnd = getDurationUntilPlainTime(periodEnd);
 
 // console.log(`Time until periodEnd: ${formattedDuration}`);
@@ -281,7 +281,7 @@ function getNewTotalScale(nowTime: Temporal.PlainTime): number {
   totalScale = Temporal.Duration.from(periodStart.until(periodEnd)).total(
     "seconds"
   );
-  remainingScale = Temporal.Duration.from(nowTime.until(periodEnd)).total(
+  availableScale = Temporal.Duration.from(nowTime.until(periodEnd)).total(
     "seconds"
   );
   return totalScale;
@@ -317,9 +317,9 @@ function refresh() {
     let periodEnd = getPeriodEnd(nowTime);
     const durationUntilPeriodEnd = getDurationUntilPlainTime(periodEnd);
 
-    console.log(totalScale, remainingScale);
-    // call updateGauge with totalScale and remainingScale. Must use types for input parameters
-    updateGauge(totalScale, remainingScale);
+    console.log(totalScale, availableScale);
+    // call updateGauge with totalScale and availableScale. Must use types for input parameters
+    updateGauge(totalScale, availableScale);
 
     updateTimeLeftDisplay(durationUntilPeriodEnd);
     refresh();
@@ -339,7 +339,7 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = /* html */ `
     </div>
     <div class="debug" style="display: none;">
       <h4 style="color: blue">totalScale: ${totalScale}</h4>
-      <h4 style="color: red">remainingScale: ${remainingScale}</h4>
+      <h4 style="color: red">availableScale: ${availableScale}</h4>
       <p>Time Now: ${currentTime}</p>
       <p>${periodEnd} - ${periodStart}</p>
       <p>NEXT THING STARTS AT WHEN??:</p>
@@ -351,5 +351,5 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = /* html */ `
   </div>
 `;
 
-updateGauge(totalScale, remainingScale);
+updateGauge(totalScale, availableScale);
 refresh();
