@@ -161,17 +161,6 @@ console.info(`now time zone ID: ${nowTimeZone}`);
 
 // 2. Set variables with values for the period start and end dates and times.
 
-// const dayStart = Temporal.PlainTime.from("00:00:00");
-// const dayEnd = Temporal.PlainTime.from("23:59:59");
-// const earlyStart = Temporal.PlainTime.from("07:00:00");
-// const earlyEnd = Temporal.PlainTime.from("08:59:59");
-// const primeStart = Temporal.PlainTime.from("09:00:00");
-// const primeEnd = Temporal.PlainTime.from("16:59:59");
-// const lateStart = Temporal.PlainTime.from("17:00:00");
-// const lateEnd = Temporal.PlainTime.from("22:59:59");
-//const startTimes = [dayStart, earlyStart, primeStart, lateStart];
-//const endTimes = [dayEnd, earlyEnd, primeEnd, lateEnd];
-
 // refactor the start times into an object. put the actual times into the object definition, so I can replace the code above:
 const periods = {
   day: {
@@ -261,11 +250,52 @@ periodEnd = getPeriodEnd(nowTime, endTimes);
 console.warn(`periodStart: ${periodStart.toString()}`);
 console.warn(`periodEnd: ${periodEnd.toString()}`);
 
+// create a new object based on the eventsDataJSON data,  with only the start and end times. Use Temporal API to put them into a PlainTime format.
+const eventsData: { start: Temporal.PlainTime; end: Temporal.PlainTime }[] =
+  eventsDataJSON.map((event) => {
+    return {
+      start: Temporal.PlainTime.from(event.start.dateTime),
+      end: Temporal.PlainTime.from(event.end.dateTime),
+    };
+  });
+
+function clipEvents(
+  periodStart: Temporal.PlainTime,
+  periodEnd: Temporal.PlainTime,
+  eventsData: { start: Temporal.PlainTime; end: Temporal.PlainTime }[]
+) {
+  return eventsData
+    .map((event) => {
+      return {
+        start: Temporal.PlainTime.from(event.start),
+        end: Temporal.PlainTime.from(event.end),
+      };
+    })
+    .filter(
+      (event) =>
+        Temporal.PlainTime.compare(event.end, periodStart) > 0 &&
+        Temporal.PlainTime.compare(event.start, periodEnd) < 0
+    )
+    .map((event) => {
+      return {
+        start:
+          Temporal.PlainTime.compare(event.start, periodStart) <= 0
+            ? event.start
+            : periodStart,
+        end:
+          Temporal.PlainTime.compare(event.end, periodEnd) >= 0
+            ? event.end
+            : periodStart,
+      };
+    })
+    .sort((a, b) => Temporal.PlainTime.compare(a.start, b.start));
+}
+
+let clippedEvents = clipEvents(periodStart, periodEnd, eventsData);
+
 // set defaults for any unused variables below:
 let totalScale = 0;
 let availableScale = 0;
-let currentTime = 0;
-let actualTimeLeft = 0;
 
 totalScale = Temporal.Duration.from(periodStart.until(periodEnd)).total(
   "seconds"
@@ -331,18 +361,6 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = /* html */ `
       <div id="timeGauge" style="width: 100%; background-color: #4CAF50; position: absolute; bottom: 0;"></div>
       </div>
       <p id="timeText"></p>
-
-    </div>
-    <div class="debug" style="display: none;">
-      <h4 style="color: blue">totalScale: ${totalScale}</h4>
-      <h4 style="color: red">availableScale: ${availableScale}</h4>
-      <p>Time Now: ${currentTime}</p>
-      <p>${periodEnd} - ${periodStart}</p>
-      <p>NEXT THING STARTS AT WHEN??:</p>
-      <p>Time Left: ${actualTimeLeft}</p>
-      <p class="footer-text">
-        Don't let your dreams be dreams
-      </p>
     </div>
   </div>
 `;
