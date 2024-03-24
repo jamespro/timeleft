@@ -10,10 +10,14 @@ import "./style.css";
  * @param {Temporal.PlainTime} periodEnd - The end time of the period
  * @return {Object} An object containing the remaining hours, minutes, and seconds
  */
-function getTimeUntilPeriodEnd(periodEnd: Temporal.PlainTime) {
+function getDurationUntilPlainTime(time: Temporal.PlainTime): {
+  hours: number;
+  minutes: number;
+  seconds: number;
+} {
   const now = Temporal.Now.plainTimeISO();
 
-  let difference = periodEnd.since(now);
+  let difference = time.since(now);
 
   return {
     hours: difference.hours,
@@ -195,7 +199,7 @@ let periodEnd = dayEnd;
 
 // 3. Pass the current period start and end times into the functions to calculate the next period start and end times.
 
-console.warn(`nowTime: ${nowTime.toString()}`);
+// console.warn(`nowTime: ${nowTime.toString()}`);
 // 3a. start time
 // Put the start times into an array to loop through and compare
 const startTimes = [dayStart, earlyStart, primeStart, lateStart];
@@ -240,10 +244,8 @@ console.warn(`periodEnd: ${periodEnd.toString()}`);
 // set defaults for any unused variables below:
 let totalScale = 0;
 let remainingScale = 0;
-let timeNowTime = 0;
 let currentTime = 0;
 let actualTimeLeft = 0;
-let timeLeft = 0;
 
 totalScale = Temporal.Duration.from(periodStart.until(periodEnd)).total(
   "seconds"
@@ -253,39 +255,82 @@ remainingScale = Temporal.Duration.from(nowTime.until(periodEnd)).total(
 );
 
 //FIXME: these are the same thing! And are they the same purpose as remainingScale?
-const timeUntilPeriodEnd = getTimeUntilPeriodEnd(periodEnd);
-const durationUntilPeriodEnd = getTimeUntilPeriodEnd(periodEnd);
+const durationUntilPeriodEnd = getDurationUntilPlainTime(periodEnd);
 
-const formattedDuration = formatDuration(durationUntilPeriodEnd);
+// console.log(`Time until periodEnd: ${formattedDuration}`);
 
-console.log(`Time until periodEnd: ${formattedDuration}`);
+let timeLeftDisplay = formatTimeLeft(durationUntilPeriodEnd);
 
-console.log(
-  `TimeLeft: ${timeUntilPeriodEnd.hours} hours, ${timeUntilPeriodEnd.minutes} minutes, and ${timeUntilPeriodEnd.seconds} seconds.`
-);
+/**
+ * Updates the time left display with the formatted duration until the end of the period.
+ *
+ * @param {Object} durationUntilPeriodEnd - An object containing the number of hours, minutes, and seconds until the end of the period.
+ * @param {number} durationUntilPeriodEnd.hours - The number of hours until the end of the period.
+ * @param {number} durationUntilPeriodEnd.minutes - The number of minutes until the end of the period.
+ * @param {number} durationUntilPeriodEnd.seconds - The number of seconds until the end of the period.
+ */
+function updateTimeLeftDisplay(durationUntilPeriodEnd: {
+  hours: number;
+  minutes: number;
+  seconds: number;
+}) {
+  timeLeftDisplay = formatTimeLeft(durationUntilPeriodEnd);
+}
 
-let displayTimeLeft = formatTimeLeft(timeUntilPeriodEnd);
+function getNewTotalScale(nowTime: Temporal.PlainTime): number {
+  totalScale = Temporal.Duration.from(periodStart.until(periodEnd)).total(
+    "seconds"
+  );
+  remainingScale = Temporal.Duration.from(nowTime.until(periodEnd)).total(
+    "seconds"
+  );
+  return totalScale;
+}
 
-function updateDisplayTimeLeft() {
-  displayTimeLeft = formatTimeLeft(timeUntilPeriodEnd);
+function getPeriodEnd(nowTime: Temporal.PlainTime) {
+  const endTimes = [earlyEnd, primeEnd, lateEnd, dayEnd];
+
+  // Find the closest future time to "nowTime"
+  const closestFutureTime = endTimes.reduce((acc, endTime) => {
+    // If endTime is after nowTime and before the current closest time, update acc
+    if (
+      Temporal.PlainTime.compare(endTime, nowTime) === 1 &&
+      Temporal.PlainTime.compare(endTime, acc) === -1
+    ) {
+      return endTime;
+    }
+    return acc;
+  }, dayEnd); // Start with the latest possible time (dayEnd) and find the earliest that's still after now
+
+  // Update periodEnd to the closest future time
+  periodEnd = closestFutureTime;
+  return periodEnd;
 }
 
 // new function to update every 100 milliseconds using setTimeout. Will updateGauge, updateDisplayTimeLeft.
 // using setTimeout, will not use setInterval
 function refresh() {
   setTimeout(() => {
-    //updateGauge expects 2 arguments:
+    const nowTime = Temporal.Now.zonedDateTimeISO().toPlainTime();
+    console.log("refreshing...");
+    let totalScale = getNewTotalScale(nowTime);
+    let periodEnd = getPeriodEnd(nowTime);
+    const durationUntilPeriodEnd = getDurationUntilPlainTime(periodEnd);
+
+    console.log(totalScale, remainingScale);
+    // call updateGauge with totalScale and remainingScale. Must use types for input parameters
     updateGauge(totalScale, remainingScale);
-    updateDisplayTimeLeft();
+
+    updateTimeLeftDisplay(durationUntilPeriodEnd);
     refresh();
-  }, 19000);
+  }, 4000);
 }
 
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = /* html */ `
   <div class="container">
     <p>Time Left</p>
     <div class="card">
-      <h1>${displayTimeLeft}</h1>
+      <h1>${timeLeftDisplay}</h1>
       <div id="timeGaugeContainer" style="width: 30px; height: 200px; background-color: #ddd; position: relative;">
       <div id="timeGauge" style="width: 100%; background-color: #4CAF50; position: absolute; bottom: 0;"></div>
       </div>
