@@ -159,6 +159,7 @@ console.info(`nowTime: ${nowTime}`);
 console.info(`now time zone ID: ${nowTimeZone}`);
 
 // 2. Set variables with values for the period start and end dates and times.
+
 const dayStart = Temporal.PlainTime.from("00:00:00");
 const dayEnd = Temporal.PlainTime.from("23:59:59");
 const earlyStart = Temporal.PlainTime.from("07:00:00");
@@ -168,8 +169,28 @@ const primeEnd = Temporal.PlainTime.from("16:59:59");
 const lateStart = Temporal.PlainTime.from("17:00:00");
 const lateEnd = Temporal.PlainTime.from("22:59:59");
 
-let periodStart = dayStart;
-let periodEnd = dayEnd;
+// refactor the start times into an object. put the actual times into the object definition, so I can replace the code above:
+const periods = {
+  day: {
+    start: Temporal.PlainTime.from("00:00:00"),
+    end: Temporal.PlainTime.from("23:59:59"),
+  },
+  early: {
+    start: Temporal.PlainTime.from("07:00:00"),
+    end: Temporal.PlainTime.from("08:59:59"),
+  },
+  prime: {
+    start: Temporal.PlainTime.from("09:00:00"),
+    end: Temporal.PlainTime.from("17:00:00"),
+  },
+  late: {
+    start: Temporal.PlainTime.from("17:00:00"),
+    end: Temporal.PlainTime.from("22:59:59"),
+  },
+};
+
+let periodStart = periods.day.start;
+let periodEnd = periods.day.end;
 
 // 3. Pass the current period start and end times into the functions to calculate the next period start and end times.
 
@@ -177,13 +198,18 @@ let periodEnd = dayEnd;
 // 3a. start time
 // Put the start times into an array to loop through and compare
 
-const startTimes = [dayStart, earlyStart, primeStart, lateStart];
+//const startTimes = [dayStart, earlyStart, primeStart, lateStart];
+
+// use periods to get the start times for each period
+
+const startTimes = Object.values(periods).map((period) => period.start);
 
 // Update periodStart to the closest past time
 function getPeriodStart(
   nowTime: Temporal.PlainTime,
   startTimes: Temporal.PlainTime[]
 ) {
+  console.log(startTimes);
   const closestPastTime = startTimes.reduce((acc, startTime) => {
     // If startTime is before nowTime and after the current closest time, update acc
     if (
@@ -193,7 +219,7 @@ function getPeriodStart(
       return startTime;
     }
     return acc;
-  }, dayStart);
+  }, periods.day.start);
 
   periodStart = closestPastTime;
   return periodStart;
@@ -202,7 +228,7 @@ periodStart = getPeriodStart(nowTime, startTimes);
 
 // 3b. end time
 // Put the end times into an array to loop through and compare
-const endTimes = [earlyEnd, primeEnd, lateEnd, dayEnd];
+const endTimes = Object.values(periods).map((period) => period.end);
 
 function getPeriodEnd(
   nowTime: Temporal.PlainTime,
@@ -218,7 +244,7 @@ function getPeriodEnd(
       return endTime;
     }
     return acc;
-  }, dayEnd); // Start with the latest possible time (dayEnd) and find the earliest that's still after now
+  }, periods.day.end); // Start with the latest possible time (dayEnd) and find the earliest that's still after now
 
   // Update periodEnd to the closest future time
   periodEnd = closestFutureTime;
@@ -256,6 +282,7 @@ function updateTimeLeftDisplay(durationUntilPeriodEnd: {
   seconds: number;
 }) {
   timeLeftDisplay = formatTimeLeft(durationUntilPeriodEnd);
+  document.getElementById("timeLeftDisplay")!.innerHTML = timeLeftDisplay;
 }
 
 function getNewTotalScale(nowTime: Temporal.PlainTime): number {
@@ -275,15 +302,15 @@ function refresh() {
     const nowTime = Temporal.Now.zonedDateTimeISO().toPlainTime();
     console.log("refreshing...");
     let totalScale = getNewTotalScale(nowTime);
-    let periodStart = getPeriodStart(nowTime, startTimes);
+    //let periodStart = getPeriodStart(nowTime, startTimes);
     let periodEnd = getPeriodEnd(nowTime, endTimes);
     const durationUntilPeriodEnd = getDurationUntilPlainTime(periodEnd);
 
     console.log(totalScale, availableScale);
     // call updateGauge with totalScale and availableScale. Must use types for input parameters
     updateGauge(totalScale, availableScale);
-
     updateTimeLeftDisplay(durationUntilPeriodEnd);
+
     refresh();
   }, 4000);
 }
@@ -292,7 +319,7 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = /* html */ `
   <div class="container">
     <p>Time Left</p>
     <div class="card">
-      <h1>${timeLeftDisplay}</h1>
+      <h1 id="timeLeftDisplay">${timeLeftDisplay}</h1>
       <div id="timeGaugeContainer" style="width: 30px; height: 200px; background-color: #ddd; position: relative;">
       <div id="timeGauge" style="width: 100%; background-color: #4CAF50; position: absolute; bottom: 0;"></div>
       </div>
