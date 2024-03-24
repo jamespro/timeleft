@@ -182,6 +182,18 @@ _MAKE AN ARRAY OR DATA STRUCTURE THAT ACCUMULATES THE TIMES, THAT MERGES ANY OVE
 
 # Log
 
+## 2024-03-24
+
+### which next steps today?
+
+- subtract event time
+- get events from a source
+- hosting: (was Heroku, needs new hosting: fly? vercel? coolify somewhere?)
+- looks: center gauge; anchor the timer text
+- move functions to other files
+
+### DONE: tick/ refresh
+
 ## 2024-03-20
 
 ### tick: thinking
