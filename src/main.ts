@@ -289,9 +289,10 @@ function getNewTotalScale(nowTime: Temporal.PlainTime): number {
   totalScale = Temporal.Duration.from(periodStart.until(periodEnd)).total(
     "seconds"
   );
-  availableScale = Temporal.Duration.from(nowTime.until(periodEnd)).total(
-    "seconds"
-  );
+  // let's also round the available scale
+  availableScale = Temporal.Duration.from(nowTime.until(periodEnd))
+    .round({ smallestUnit: "seconds", roundingMode: "halfExpand" })
+    .total("seconds");
   return totalScale;
 }
 
@@ -300,19 +301,19 @@ function getNewTotalScale(nowTime: Temporal.PlainTime): number {
 function refresh() {
   setTimeout(() => {
     const nowTime = Temporal.Now.zonedDateTimeISO().toPlainTime();
-    console.log("refreshing...");
+    // console.log("refreshing...");
     let totalScale = getNewTotalScale(nowTime);
-    //let periodStart = getPeriodStart(nowTime, startTimes);
+    //let periodStart = getPeriodStart(nowTime, startTimes); //don't need to get a new periodStart?
     let periodEnd = getPeriodEnd(nowTime, endTimes);
     const durationUntilPeriodEnd = getDurationUntilPlainTime(periodEnd);
 
-    console.log(totalScale, availableScale);
+    // console.log(totalScale, availableScale);
     // call updateGauge with totalScale and availableScale. Must use types for input parameters
     updateGauge(totalScale, availableScale);
     updateTimeLeftDisplay(durationUntilPeriodEnd);
 
     refresh();
-  }, 4000);
+  }, 200);
 }
 
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = /* html */ `
