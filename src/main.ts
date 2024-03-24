@@ -32,6 +32,7 @@ function formatDuration(duration: {
   return `${hours}:${minutes}:${seconds}`;
 }
 
+// this was doing weird things when the minutes or seconds is zero: not showing the colon after minutes, not showing the minutes...
 function formatTimeLeft(duration: {
   hours: number;
   minutes: number;
@@ -40,13 +41,13 @@ function formatTimeLeft(duration: {
   return `${
     duration.hours > 0
       ? `${duration.hours}${
-          duration.minutes > 0 || duration.seconds > 0 ? ":" : ""
+          duration.minutes > 0 || duration.seconds > 0 ? ":" : ":"
         }`
       : ""
   }${
     duration.minutes > 0
       ? `${duration.minutes.toString().padStart(2, "0")}${
-          duration.seconds > 0 ? ":" : ""
+          duration.seconds > 0 ? ":" : ":"
         }`
       : ""
   }${duration.seconds.toString().padStart(2, "0")}`;
@@ -160,14 +161,16 @@ console.info(`now time zone ID: ${nowTimeZone}`);
 
 // 2. Set variables with values for the period start and end dates and times.
 
-const dayStart = Temporal.PlainTime.from("00:00:00");
-const dayEnd = Temporal.PlainTime.from("23:59:59");
-const earlyStart = Temporal.PlainTime.from("07:00:00");
-const earlyEnd = Temporal.PlainTime.from("08:59:59");
-const primeStart = Temporal.PlainTime.from("09:00:00");
-const primeEnd = Temporal.PlainTime.from("16:59:59");
-const lateStart = Temporal.PlainTime.from("17:00:00");
-const lateEnd = Temporal.PlainTime.from("22:59:59");
+// const dayStart = Temporal.PlainTime.from("00:00:00");
+// const dayEnd = Temporal.PlainTime.from("23:59:59");
+// const earlyStart = Temporal.PlainTime.from("07:00:00");
+// const earlyEnd = Temporal.PlainTime.from("08:59:59");
+// const primeStart = Temporal.PlainTime.from("09:00:00");
+// const primeEnd = Temporal.PlainTime.from("16:59:59");
+// const lateStart = Temporal.PlainTime.from("17:00:00");
+// const lateEnd = Temporal.PlainTime.from("22:59:59");
+//const startTimes = [dayStart, earlyStart, primeStart, lateStart];
+//const endTimes = [dayEnd, earlyEnd, primeEnd, lateEnd];
 
 // refactor the start times into an object. put the actual times into the object definition, so I can replace the code above:
 const periods = {
@@ -189,6 +192,9 @@ const periods = {
   },
 };
 
+// example how to adjust one specific time:
+//periods.prime.end = periods.prime.end.add({ minutes: 8 });
+
 let periodStart = periods.day.start;
 let periodEnd = periods.day.end;
 
@@ -197,8 +203,6 @@ let periodEnd = periods.day.end;
 // console.warn(`nowTime: ${nowTime.toString()}`);
 // 3a. start time
 // Put the start times into an array to loop through and compare
-
-//const startTimes = [dayStart, earlyStart, primeStart, lateStart];
 
 // use periods to get the start times for each period
 
@@ -274,14 +278,14 @@ const durationUntilPeriodEnd = getDurationUntilPlainTime(periodEnd);
 
 // console.log(`Time until periodEnd: ${formattedDuration}`);
 
-let timeLeftDisplay = formatTimeLeft(durationUntilPeriodEnd);
+let timeLeftDisplay = formatDuration(durationUntilPeriodEnd);
 
 function updateTimeLeftDisplay(durationUntilPeriodEnd: {
   hours: number;
   minutes: number;
   seconds: number;
 }) {
-  timeLeftDisplay = formatTimeLeft(durationUntilPeriodEnd);
+  timeLeftDisplay = formatDuration(durationUntilPeriodEnd);
   document.getElementById("timeLeftDisplay")!.innerHTML = timeLeftDisplay;
 }
 
@@ -320,7 +324,9 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = /* html */ `
   <div class="container">
     <p>Time Left</p>
     <div class="card">
-      <h1 id="timeLeftDisplay">${timeLeftDisplay}</h1>
+      <div id="timeLeftContainer">
+        <h1 id="timeLeftDisplay">${timeLeftDisplay}</h1>
+      </div>
       <div id="timeGaugeContainer" style="width: 30px; height: 200px; background-color: #ddd; position: relative;">
       <div id="timeGauge" style="width: 100%; background-color: #4CAF50; position: absolute; bottom: 0;"></div>
       </div>
