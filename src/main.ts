@@ -69,81 +69,91 @@ function updateGauge(totalScale: number, availableScale: number) {
 const eventsDataJSON = [
   {
     start: {
-      dateTime: "2024-03-20T08:30:00-05:00",
+      dateTime: "2024-03-24T08:30:00-05:00",
       timeZone: "America/New_York",
     },
     end: {
-      dateTime: "2024-03-20T10:00:00-05:00",
+      dateTime: "2024-03-24T10:00:00-05:00",
       timeZone: "America/New_York",
     },
   },
   {
     start: {
-      dateTime: "2024-03-20T09:30:00-05:00",
+      dateTime: "2024-03-24T09:30:00-05:00",
       timeZone: "America/New_York",
     },
     end: {
-      dateTime: "2024-03-20T11:00:00-05:00",
+      dateTime: "2024-03-24T11:00:00-05:00",
       timeZone: "America/New_York",
     },
   },
   {
     start: {
-      dateTime: "2024-03-20T12:00:00-05:00",
+      dateTime: "2024-03-24T12:00:00-05:00",
       timeZone: "America/New_York",
     },
     end: {
-      dateTime: "2024-03-20T13:00:00-05:00",
+      dateTime: "2024-03-24T13:00:00-05:00",
       timeZone: "America/New_York",
     },
   },
   {
     start: {
-      dateTime: "2024-03-20T14:00:00-05:00",
+      dateTime: "2024-03-24T14:00:00-05:00",
       timeZone: "America/New_York",
     },
     end: {
-      dateTime: "2024-03-20T15:00:00-05:00",
+      dateTime: "2024-03-24T15:00:00-05:00",
       timeZone: "America/New_York",
     },
   },
   {
     start: {
-      dateTime: "2024-03-20T16:30:00-05:00",
+      dateTime: "2024-03-24T16:30:00-05:00",
       timeZone: "America/New_York",
     },
     end: {
-      dateTime: "2024-03-20T17:30:00-05:00",
+      dateTime: "2024-03-24T17:30:00-05:00",
       timeZone: "America/New_York",
     },
   },
   {
     start: {
-      dateTime: "2024-03-20T18:00:00-05:00",
+      dateTime: "2024-03-24T18:00:00-05:00",
       timeZone: "America/New_York",
     },
     end: {
-      dateTime: "2024-03-20T19:00:00-05:00",
+      dateTime: "2024-03-24T19:00:00-05:00",
       timeZone: "America/New_York",
     },
   },
   {
     start: {
-      dateTime: "2024-03-20T20:30:00-05:00",
+      dateTime: "2024-03-24T20:30:00-05:00",
       timeZone: "America/New_York",
     },
     end: {
-      dateTime: "2024-03-20T21:30:00-05:00",
+      dateTime: "2024-03-24T21:30:00-05:00",
       timeZone: "America/New_York",
     },
   },
   {
     start: {
-      dateTime: "2024-03-20T22:00:00-05:00",
+      dateTime: "2024-03-24T22:00:00-05:00",
       timeZone: "America/New_York",
     },
     end: {
-      dateTime: "2024-03-20T22:30:00-05:00",
+      dateTime: "2024-03-24T22:29:00-05:00",
+      timeZone: "America/New_York",
+    },
+  },
+  {
+    start: {
+      dateTime: "2024-03-24T22:55:00-05:00",
+      timeZone: "America/New_York",
+    },
+    end: {
+      dateTime: "2024-03-24T22:57:00-05:00",
       timeZone: "America/New_York",
     },
   },
@@ -293,9 +303,55 @@ function clipEvents(
 
 let clippedEvents = clipEvents(periodStart, periodEnd, eventsData);
 
+function mergeOverlappingEvents(
+  events: { start: Temporal.PlainTime; end: Temporal.PlainTime }[]
+): { start: Temporal.PlainTime; end: Temporal.PlainTime }[] {
+  const mergedEvents: { start: Temporal.PlainTime; end: Temporal.PlainTime }[] =
+    [];
+  let lastEvent: null | { start: Temporal.PlainTime; end: Temporal.PlainTime } =
+    null;
+
+  events.forEach((event) => {
+    // if there is no last event or the current event starts after the last event ends
+    if (
+      !lastEvent ||
+      Temporal.PlainTime.compare(event.start, lastEvent.end) > 0
+    ) {
+      // add the current event to the merged events
+      mergedEvents.push(event);
+      // update the last event to the current event
+      lastEvent = event;
+    } else if (Temporal.PlainTime.compare(event.end, lastEvent.end) > 0) {
+      // else if the current event ends after the last event ends
+      // then update the end time of the last event to the end time of the current event
+      lastEvent.end = event.end;
+    }
+  });
+  // return the merged events array
+  return mergedEvents;
+}
+
+let mergedEvents = mergeOverlappingEvents(clippedEvents);
+
+// const eventDuration = mergedEvents.reduce((total, event) => {
+//   return total + (event.end - event.start) / (1000 * 60); // in minutes
+// }, 0);
+
+function getEventsDuration(
+  mergedEvents: {
+    start: Temporal.PlainTime;
+    end: Temporal.PlainTime;
+  }[]
+): number {
+  return mergedEvents.reduce((total, event) => {
+    return total + event.end.since(event.start).total("seconds");
+    // return total + (event.end - event.start) / (1000 * 60); // in minutes
+  }, 0);
+}
+
 // set defaults for any unused variables below:
-let totalScale = 0;
-let availableScale = 0;
+let totalScale: number = 0;
+let availableScale: number = 0;
 
 totalScale = Temporal.Duration.from(periodStart.until(periodEnd)).total(
   "seconds"
@@ -334,16 +390,34 @@ function getNewTotalScale(nowTime: Temporal.PlainTime): number {
 // using setTimeout, will not use setInterval
 function refresh() {
   setTimeout(() => {
-    const nowTime = Temporal.Now.zonedDateTimeISO().toPlainTime();
     // console.log("refreshing...");
-    let totalScale = getNewTotalScale(nowTime);
+    const nowTime = Temporal.Now.zonedDateTimeISO().toPlainTime();
     //let periodStart = getPeriodStart(nowTime, startTimes); //don't need to get a new periodStart?
     let periodEnd = getPeriodEnd(nowTime, endTimes);
-    const durationUntilPeriodEnd = getDurationUntilPlainTime(periodEnd);
+    // let totalScale = getNewTotalScale(nowTime);
+    let totalScale = Temporal.Duration.from(periodStart.until(periodEnd)).total(
+      "seconds"
+    );
+    // let's also round the available scale
+    let availableScale = Temporal.Duration.from(nowTime.until(periodEnd))
+      .round({ smallestUnit: "seconds", roundingMode: "halfExpand" })
+      .total("seconds");
 
+    const durationUntilPeriodEnd = getDurationUntilPlainTime(periodEnd);
+    const eventsDuration = getEventsDuration(mergedEvents);
+    // const availableDuration = durationUntilPeriodEnd - eventsDuration;
     // console.log(totalScale, availableScale);
-    // call updateGauge with totalScale and availableScale. Must use types for input parameters
+    // update totalScale and availableScale to subtract eventsDuration
+    // update eventsDurationDisplay to display eventsDuration
+    document.getElementById("eventsDurationDisplay")!.innerHTML = `${
+      availableScale - eventsDuration
+    } seconds`;
+    // from the gauge, reduce the time of the events during this period
+    availableScale = availableScale - eventsDuration;
     updateGauge(totalScale, availableScale);
+
+    // from the time display, reduce the time of the events during this period
+    // durationUntilPeriodEnd = durationUntilPeriodEnd - eventsDuration;
     updateTimeLeftDisplay(durationUntilPeriodEnd);
 
     refresh();
@@ -357,10 +431,11 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = /* html */ `
       <div id="timeLeftContainer">
         <h1 id="timeLeftDisplay">${timeLeftDisplay}</h1>
       </div>
-      <div id="timeGaugeContainer" style="width: 30px; height: 200px; background-color: #ddd; position: relative;">
+      <div id="timeGaugeContainer" style="width: 60px; height: 200px; background-color: #ddd; position: relative;">
       <div id="timeGauge" style="width: 100%; background-color: #4CAF50; position: absolute; bottom: 0;"></div>
       </div>
       <p id="timeText"></p>
+      <p id="eventsDurationDisplay"></p>
     </div>
   </div>
 `;
