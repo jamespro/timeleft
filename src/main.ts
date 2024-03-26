@@ -337,7 +337,7 @@ let mergedEvents = mergeOverlappingEvents(clippedEvents);
 //   return total + (event.end - event.start) / (1000 * 60); // in minutes
 // }, 0);
 
-function getEventsDuration(
+function getEventsSeconds(
   mergedEvents: {
     start: Temporal.PlainTime;
     end: Temporal.PlainTime;
@@ -347,6 +347,28 @@ function getEventsDuration(
     return total + event.end.since(event.start).total("seconds");
     // return total + (event.end - event.start) / (1000 * 60); // in minutes
   }, 0);
+}
+
+function getEventsDuration(
+  mergedEvents: {
+    start: Temporal.PlainTime;
+    end: Temporal.PlainTime;
+  }[]
+): Temporal.Duration {
+  let totalDuration = Temporal.Duration.from({
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
+
+  mergedEvents.forEach((event) => {
+    const start = Temporal.PlainTime.from(event.start);
+    const end = Temporal.PlainTime.from(event.end);
+    const eventDuration = end.since(start);
+    totalDuration = totalDuration.add(eventDuration);
+  });
+
+  return totalDuration;
 }
 
 // set defaults for any unused variables below:
@@ -403,22 +425,26 @@ function refresh() {
       .round({ smallestUnit: "seconds", roundingMode: "halfExpand" })
       .total("seconds");
 
-    const durationUntilPeriodEnd = getDurationUntilPlainTime(periodEnd);
-    const eventsDuration = getEventsDuration(mergedEvents);
+    const eventsSeconds = getEventsSeconds(mergedEvents);
     // const availableDuration = durationUntilPeriodEnd - eventsDuration;
     // console.log(totalScale, availableScale);
     // update totalScale and availableScale to subtract eventsDuration
     // update eventsDurationDisplay to display eventsDuration
-    document.getElementById("eventsDurationDisplay")!.innerHTML = `${
-      availableScale - eventsDuration
-    } seconds`;
+    // document.getElementById("eventsDurationDisplay")!.innerHTML = `${
+    //   availableScale - eventsDuration
+    // } seconds`;
     // from the gauge, reduce the time of the events during this period
-    availableScale = availableScale - eventsDuration;
+    availableScale = availableScale - eventsSeconds;
     updateGauge(totalScale, availableScale);
 
-    // from the time display, reduce the time of the events during this period
-    // durationUntilPeriodEnd = durationUntilPeriodEnd - eventsDuration;
-    updateTimeLeftDisplay(durationUntilPeriodEnd);
+    const durationUntilPeriodEnd = getDurationUntilPlainTime(periodEnd);
+    const eventsDuration = getEventsDuration(mergedEvents);
+
+    // need to subtract eventsDuration from durationUntilPeriodEnd
+    const availableDuration = Temporal.Duration.from(
+      durationUntilPeriodEnd
+    ).subtract(eventsDuration);
+    updateTimeLeftDisplay(availableDuration);
 
     refresh();
   }, 200);
