@@ -69,81 +69,81 @@ function updateGauge(totalScale: number, availableScale: number) {
 const eventsDataJSON = [
   {
     start: {
-      dateTime: "2024-03-20T08:30:00-05:00",
+      dateTime: "2024-03-26T08:30:00-05:00",
       timeZone: "America/New_York",
     },
     end: {
-      dateTime: "2024-03-20T10:00:00-05:00",
+      dateTime: "2024-03-26T10:00:00-05:00",
       timeZone: "America/New_York",
     },
   },
   {
     start: {
-      dateTime: "2024-03-20T09:30:00-05:00",
+      dateTime: "2024-03-26T09:30:00-05:00",
       timeZone: "America/New_York",
     },
     end: {
-      dateTime: "2024-03-20T11:00:00-05:00",
+      dateTime: "2024-03-26T11:00:00-05:00",
       timeZone: "America/New_York",
     },
   },
   {
     start: {
-      dateTime: "2024-03-20T12:00:00-05:00",
+      dateTime: "2024-03-26T12:00:00-05:00",
       timeZone: "America/New_York",
     },
     end: {
-      dateTime: "2024-03-20T13:00:00-05:00",
+      dateTime: "2024-03-26T13:00:00-05:00",
       timeZone: "America/New_York",
     },
   },
   {
     start: {
-      dateTime: "2024-03-20T14:00:00-05:00",
+      dateTime: "2024-03-26T14:00:00-05:00",
       timeZone: "America/New_York",
     },
     end: {
-      dateTime: "2024-03-20T15:00:00-05:00",
+      dateTime: "2024-03-26T15:00:00-05:00",
       timeZone: "America/New_York",
     },
   },
   {
     start: {
-      dateTime: "2024-03-20T16:30:00-05:00",
+      dateTime: "2024-03-26T16:30:00-05:00",
       timeZone: "America/New_York",
     },
     end: {
-      dateTime: "2024-03-20T17:30:00-05:00",
+      dateTime: "2024-03-26T17:30:00-05:00",
       timeZone: "America/New_York",
     },
   },
   {
     start: {
-      dateTime: "2024-03-20T18:00:00-05:00",
+      dateTime: "2024-03-26T18:00:00-05:00",
       timeZone: "America/New_York",
     },
     end: {
-      dateTime: "2024-03-20T19:00:00-05:00",
+      dateTime: "2024-03-26T19:00:00-05:00",
       timeZone: "America/New_York",
     },
   },
   {
     start: {
-      dateTime: "2024-03-20T20:30:00-05:00",
+      dateTime: "2024-03-26T20:30:00-05:00",
       timeZone: "America/New_York",
     },
     end: {
-      dateTime: "2024-03-20T21:30:00-05:00",
+      dateTime: "2024-03-26T21:30:00-05:00",
       timeZone: "America/New_York",
     },
   },
   {
     start: {
-      dateTime: "2024-03-20T22:00:00-05:00",
+      dateTime: "2024-03-26T22:00:00-05:00",
       timeZone: "America/New_York",
     },
     end: {
-      dateTime: "2024-03-20T22:30:00-05:00",
+      dateTime: "2024-03-26T22:30:00-05:00",
       timeZone: "America/New_York",
     },
   },
