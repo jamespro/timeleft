@@ -182,6 +182,42 @@ _MAKE AN ARRAY OR DATA STRUCTURE THAT ACCUMULATES THE TIMES, THAT MERGES ANY OVE
 
 # Log
 
+## 2024-03-26
+
+2024-03-26 notes APP TimeLeft
+
+TOTALTIME =
+PeriodEnd -
+PeriodStart
+
+difference (as DURATION)
+
+converts to total Scale as type? PlainTime or seconds, milli, nano seconds?
+
+RESULTS, TURNED INTO:
+
+- CLOCK as HH: MM: SS
+- GAUGE as 100%
+  gave up needing seconds to convert across functions? use Plain Time as common format? but need more Type script?
+  Clock- subtract HH MM SS
+
+subtracting from total time
+
+ELAPSED = elapsed tine since period Start
+= nowTime -period Start as Duration
+
+- output in PlainTime
+
+BUSY =
+
+- CLIP events data at nowTime - periodEnd then
+- MERGE then
+- calculate/SUM durations
+- output in Plain Time (?)
+
+AVAILABLE =
+TOTALTIME - ELAPSED - BUSY
+
 ## 2024-03-20
 
 ### tick: thinking

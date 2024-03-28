@@ -374,3 +374,17 @@ const debugPeriodNames = [
   "periodEnd",
 ];
 ```
+
+- old debug print code:
+
+```
+    <div class="debug" style="display: none;">
+      <p>Time Now: ${currentTime}</p>
+      <p>${periodEnd} - ${periodStart}</p>
+      <p>NEXT THING STARTS AT WHEN??:</p>
+      <p>Time Left: ${actualTimeLeft}</p>
+      <p class="footer-text">
+        Don't let your dreams be dreams
+      </p>
+    </div>
+```
