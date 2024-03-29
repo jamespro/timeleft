@@ -1,92 +1,261 @@
+import { Temporal } from "temporal-polyfill";
+import { periods } from "./periods";
+import { eventsDataJSON } from "./eventsdata";
 import "./style.css";
 
-// 1. Events data: JSON array of events. Use the Google Calendar API as an example for sample data. Must contain 9 events. One event must start and end at the same time. One event must start before the period and end within the period. One event must start and end after the period. One event must be within the period. One event must overlap with the period end. One event must overlap with another event. Every event must start on March 5, 2024.
+// Your existing code that uses the periods object...import "./style.css";
 
-// 2. Events data: Fetch events. Currently coming from Google Calendar API.
-// 3. Truncate event times: Ensure all event times are clipped to the period's start and end bounaries. If an event starts before the period, change it to start at the period's start. If an event ends after the period, change it to end at the period's end.
-// 4. Merge overlapping events: Combine events that overlap into a single event to avoid double counting.
-// 5. Calculate total unavailable time: calculate the total duration of all (merged) events.
-// 6. Calculate available time: subtract the total unavailable time from the total time in the period.
+//NOTE: USE JavaScript Temporal API for all dates and calculations. USE Google Calendar API format for dates. USE ISO 8601 format for time.
 
-// Types of periods. Each period must include a start time and end time during the same 24 hours.
-// early
-// prime
-// late
+//Functions for calculating time left
 
-// Task 1. display current date and time. set a javascript variable with date and time to output in the HTML.
-// Task 2. display time of next event.
+// function formatHMS(duration: {
+//   hours: number;
+//   minutes: number;
+//   seconds: number;
+// }) {
+//   const hours = duration.hours.toString();
+//   const minutes = duration.minutes.toString().padStart(2, "0");
+//   const seconds = duration.seconds.toString().padStart(2, "0");
 
-const currentDate = new Date();
-const currentMonth = currentDate.getMonth().toString().padStart(2, "0");
-const currentDay = currentDate.getDate().toString().padStart(2, "0");
-const currentHour = currentDate.getHours().toString().padStart(2, "0");
-const currentMinute = currentDate.getMinutes().toString().padStart(2, "0");
-const currentSecond = currentDate.getSeconds().toString().padStart(2, "0");
-const currentYear = currentDate.getFullYear();
+//   return `${hours}:${minutes}:${seconds}`;
+// }
 
-const currentTime = `${currentHour}:${currentMinute}:${currentSecond}`;
+function formatDuration(duration: Temporal.Duration) {
+  const hours = duration.hours.toString();
+  const minutes = duration.minutes.toString().padStart(2, "0");
+  const seconds = duration.seconds.toString().padStart(2, "0");
 
-/* 
-SET DEFAULTS FOR TIME PERIODS
-*/
-
-const timeNow = new Date();
-
-// 2024-02-25T00:00:01-05:00
-const datePart = currentYear + "-" + currentMonth + "-" + currentDay;
-
-console.log(datePart);
-const dayStart = new Date(`${datePart}T00:00:01-05:00`);
-const dayEnd = new Date(`${datePart}T23:59:59-05:00`);
-const primeStart = new Date(`${datePart}T09:00:00-05:00`);
-const primeEnd = new Date(`${datePart}T17:00:00-05:00`);
-const earlyStart = new Date(`${datePart}T07:00:00-05:00`);
-const earlyEnd = primeEnd;
-const lateStart = primeEnd;
-const lateEnd = new Date(`${datePart}T21:00:00-05:00`);
-
-let periodStart = dayStart;
-let periodEnd = dayEnd;
-
-if (timeNow > earlyStart) {
-  periodStart = earlyStart;
-  periodEnd = earlyEnd;
+  return `${hours}:${minutes}:${seconds}`;
 }
 
-if (timeNow > primeStart) {
-  periodStart = primeStart;
-  periodEnd = primeEnd;
+// this was doing weird things when the minutes or seconds is zero: not showing the colon after minutes, not showing the minutes...
+// function formatTimeLeft(duration: {
+//   hours: number;
+//   minutes: number;
+//   seconds: number;
+// }) {
+//   return `${
+//     duration.hours > 0
+//       ? `${duration.hours}${
+//           duration.minutes > 0 || duration.seconds > 0 ? ":" : ":"
+//         }`
+//       : ""
+//   }${
+//     duration.minutes > 0
+//       ? `${duration.minutes.toString().padStart(2, "0")}${
+//           duration.seconds > 0 ? ":" : ":"
+//         }`
+//       : ""
+//   }${duration.seconds.toString().padStart(2, "0")}`;
+// }
+
+// function updateGauge(totalScale: number, availableScale: number) {
+//   const proportion = (availableScale / totalScale) * 100;
+//   const gauge = document.getElementById("timeGauge");
+//   gauge!.style.height = proportion + "%";
+
+//   // Update text to show the exact time available/total
+//   const text = `${availableScale} seconds available of ${totalScale} total seconds`;
+//   document.getElementById("timeText")!.innerText = text;
+// }
+
+// 0. GET DATA: Set up a JSON object for sample events data. each event will have a start and end time. the start and end times will be in the same day.
+//NOTE: maybe the periods are also data to get from somewhere?
+
+// 1. Set up defaults for the current time and time zone.
+const nowTemporal = Temporal.Now.zonedDateTimeISO().toString();
+const now = Temporal.Now.zonedDateTimeISO();
+const nowTime = now.toPlainTime();
+const nowTimeZone = Temporal.Now.zonedDateTimeISO().timeZoneId;
+console.info(`nowTemporal: ${nowTemporal}`);
+console.info(`now: ${now}`);
+console.info(`nowTime: ${nowTime}`);
+console.info(`now time zone ID: ${nowTimeZone}`);
+
+// 2. Set variables with values for the period start and end dates and times.
+
+// example how to adjust one specific time:
+//periods.prime.end = periods.prime.end.add({ minutes: 8 });
+
+let periodStart = periods.day.start;
+let periodEnd = periods.day.end;
+
+// 3. Pass the current period start and end times into the functions to calculate the next period start and end times.
+
+// console.warn(`nowTime: ${nowTime.toString()}`);
+// 3a. start time
+// Put the start times into an array to loop through and compare
+
+// use periods to get the start times for each period
+
+const startTimes = Object.values(periods).map((period) => period.start);
+
+// Update periodStart to the closest past time
+function getPeriodStart(
+  nowTime: Temporal.PlainTime,
+  startTimes: Temporal.PlainTime[]
+) {
+  console.log(startTimes);
+  const closestPastTime = startTimes.reduce((acc, startTime) => {
+    // If startTime is before nowTime and after the current closest time, update acc
+    if (
+      Temporal.PlainTime.compare(startTime, nowTime) === -1 &&
+      Temporal.PlainTime.compare(startTime, acc) === 1
+    ) {
+      return startTime;
+    }
+    return acc;
+  }, periods.day.start);
+
+  periodStart = closestPastTime;
+  return periodStart;
+}
+periodStart = getPeriodStart(nowTime, startTimes);
+
+// 3b. end time
+// Put the end times into an array to loop through and compare
+const endTimes = Object.values(periods).map((period) => period.end);
+
+function getPeriodEnd(
+  nowTime: Temporal.PlainTime,
+  endTimes: Temporal.PlainTime[]
+) {
+  // Find the closest future time to "nowTime"
+  const closestFutureTime = endTimes.reduce((acc, endTime) => {
+    // If endTime is after nowTime and before the current closest time, update acc
+    if (
+      Temporal.PlainTime.compare(endTime, nowTime) === 1 &&
+      Temporal.PlainTime.compare(endTime, acc) === -1
+    ) {
+      return endTime;
+    }
+    return acc;
+  }, periods.day.end); // Start with the latest possible time (dayEnd) and find the earliest that's still after now
+
+  // Update periodEnd to the closest future time
+  periodEnd = closestFutureTime;
+  return periodEnd;
 }
 
-if (timeNow > lateStart) {
-  periodStart = lateStart;
-  periodEnd = lateEnd;
+// Update periodEnd to the closest future time
+periodEnd = getPeriodEnd(nowTime, endTimes);
+
+console.warn(`periodStart: ${periodStart.toString()}`);
+console.warn(`periodEnd: ${periodEnd.toString()}`);
+
+// set defaults for any unused variables below:
+// let totalScale = 0;
+// let availableScale = 0;
+// let currentTime = 0;
+// let actualTimeLeft = 0;
+
+// totalScale = Temporal.Duration.from(periodStart.until(periodEnd)).total(
+//   "seconds"
+// );
+// availableScale = Temporal.Duration.from(nowTime.until(periodEnd)).total(
+//   "seconds"
+// );
+
+// const durationUntilPeriodEnd = getDurationUntilPlainTime(periodEnd);
+
+// console.log(`Time until periodEnd: ${formattedDuration}`);
+
+// let timeLeftDisplay = formatHMS(durationUntilPeriodEnd);
+
+// function updateTimeLeftDisplay(displayTime: Temporal.Duration) {
+//   timeLeftDisplay = formatDuration(displayTime);
+//   document.getElementById("timeLeftDisplay")!.innerHTML = timeLeftDisplay;
+// }
+
+// function getNewTotalScale(nowTime: Temporal.PlainTime): number {
+//   totalScale = Temporal.Duration.from(periodStart.until(periodEnd)).total(
+//     "seconds"
+//   );
+//   // let's also round the available scale
+//   availableScale = Temporal.Duration.from(nowTime.until(periodEnd))
+//     .round({ smallestUnit: "seconds", roundingMode: "halfExpand" })
+//     .total("seconds");
+//   return totalScale;
+// }
+function getPeriodTotalDuration(
+  periodStart: Temporal.PlainTime,
+  periodEnd: Temporal.PlainTime
+): Temporal.Duration {
+  return periodStart.until(periodEnd);
 }
-
-if (timeNow > lateEnd) {
-  periodStart = lateEnd;
-  periodEnd = dayEnd;
+function getPeriodRemainingDuration(
+  nowTime: Temporal.PlainTime,
+  periodEnd: Temporal.PlainTime
+): Temporal.Duration {
+  return nowTime.until(periodEnd);
 }
+const periodTotalDuration = getPeriodTotalDuration(periodStart, periodEnd);
+// console.log(periodTotalDuration.hours);
+const periodRemainingDuration = getPeriodRemainingDuration(nowTime, periodEnd);
+// console.log(periodRemainingDuration.hours);
 
-let actualTimeLeft = 123; //set a default value
+let timeLeftDisplay = formatDuration(periodRemainingDuration);
 
-console.log(periodStart);
-console.log(periodEnd);
+//TODO: You can ADD a "availableProportion" instead of replacing this one, so that you could show both available and remaining
+const remainingProportion =
+  (Temporal.Duration.from(periodRemainingDuration).total("seconds") /
+    Temporal.Duration.from(periodTotalDuration).total("seconds")) *
+  100;
+
+// new function to update every 100 milliseconds using setTimeout. Will updateGauge, updateDisplayTimeLeft.
+// using setTimeout, will not use setInterval
+function refresh() {
+  setTimeout(() => {
+    const nowTime = Temporal.Now.zonedDateTimeISO().toPlainTime();
+    // console.log("refreshing...");
+    // let totalScale = getNewTotalScale(nowTime);
+    //let periodStart = getPeriodStart(nowTime, startTimes); //don't need to get a new periodStart?
+    let periodEnd = getPeriodEnd(nowTime, endTimes);
+    // const durationUntilPeriodEnd = getDurationUntilPlainTime(periodEnd);
+    const periodTotalDuration = getPeriodTotalDuration(periodStart, periodEnd);
+    const periodRemainingDuration = getPeriodRemainingDuration(
+      nowTime,
+      periodEnd
+    );
+    // console.log(periodTotalDuration.hours);
+
+    // updateTimeLeftDisplay(periodRemainingDuration);
+    // timeLeftDisplay = formatDuration(periodRemainingDuration);
+    document.getElementById("timeLeftDisplay")!.innerHTML = formatDuration(
+      periodRemainingDuration
+    );
+
+    // console.log(totalScale, availableScale);
+    // call updateGauge with totalScale and availableScale. Must use types for input parameters
+    //    updateGauge(totalScale, availableScale);
+    //TODO: You can ADD a "availableProportion" instead of replacing this one, so that you could show both available and remaining
+    const remainingProportion =
+      (Temporal.Duration.from(periodRemainingDuration).total("seconds") /
+        Temporal.Duration.from(periodTotalDuration).total("seconds")) *
+      100;
+    const gauge = document.getElementById("timeGauge");
+    gauge!.style.height = remainingProportion + "%";
+
+    refresh();
+  }, 200);
+}
 
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = /* html */ `
-  <div>
-    <p>Time Left Today</p>
-    <p>Time Now: ${currentTime}</p>
-    <!-- <div class="card">
-      <button id="counter" type="button"></button>
-    </div> -->
+  <div class="container">
+    <p>Time Left</p>
     <div class="card">
-      <h4>${periodStart} - ${periodEnd}</h4>
-      <h4>NEXT THING STARTS AT WHEN??:</h4>
-      <h4>${actualTimeLeft}</h4>
-      <p class="footer-text">
-        Don't let your dreams be dreams
-      </p>
+      <div id="timeLeftContainer">
+        <h1 id="timeLeftDisplay">${timeLeftDisplay}</h1>
+      </div>
+      <div id="timeGaugeContainer" style="width: 30px; height: 200px; background-color: #ddd; position: relative;">
+      <div id="timeGauge" style="width: 100%; height: ${remainingProportion}%; background-color: #4CAF50; position: absolute; bottom: 0;"></div>
+      </div>
+      <p id="timeText"></p>
+
     </div>
   </div>
 `;
+
+//updateGauge(totalScale, availableScale);
+refresh();

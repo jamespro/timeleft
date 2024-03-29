@@ -1,19 +1,18 @@
 {
   "name": "timeleft",
-  "version": "1.0.0",
-  "description": "Show you the actual amount of useful time you have left",
-  "main": "index.js",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/jamespro/timeleft.git"
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "vite": "^5.1.0"
   },
-  "author": "James Prickitt (jamespro)",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/jamespro/timeleft/issues"
-  },
-  "homepage": "https://github.com/jamespro/timeleft#readme"
+  "dependencies": {
+    "temporal-polyfill": "^0.2.3"
+  }
 }
