@@ -3,6 +3,11 @@ import { periods } from "./periods";
 import { eventsDataJSON } from "./eventsdata";
 import "./style.css";
 
+const eventsData = eventsDataJSON;
+if (eventsData.length === 0) {
+  console.log(eventsData);
+}
+
 // Your existing code that uses the periods object...import "./style.css";
 
 //NOTE: USE JavaScript Temporal API for all dates and calculations. USE Google Calendar API format for dates. USE ISO 8601 format for time.

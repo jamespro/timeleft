@@ -33,25 +33,25 @@ function formatDuration(duration: {
 }
 
 // this was doing weird things when the minutes or seconds is zero: not showing the colon after minutes, not showing the minutes...
-function formatTimeLeft(duration: {
-  hours: number;
-  minutes: number;
-  seconds: number;
-}) {
-  return `${
-    duration.hours > 0
-      ? `${duration.hours}${
-          duration.minutes > 0 || duration.seconds > 0 ? ":" : ":"
-        }`
-      : ""
-  }${
-    duration.minutes > 0
-      ? `${duration.minutes.toString().padStart(2, "0")}${
-          duration.seconds > 0 ? ":" : ":"
-        }`
-      : ""
-  }${duration.seconds.toString().padStart(2, "0")}`;
-}
+// function formatTimeLeft(duration: {
+//   hours: number;
+//   minutes: number;
+//   seconds: number;
+// }) {
+//   return `${
+//     duration.hours > 0
+//       ? `${duration.hours}${
+//           duration.minutes > 0 || duration.seconds > 0 ? ":" : ":"
+//         }`
+//       : ""
+//   }${
+//     duration.minutes > 0
+//       ? `${duration.minutes.toString().padStart(2, "0")}${
+//           duration.seconds > 0 ? ":" : ":"
+//         }`
+//       : ""
+//   }${duration.seconds.toString().padStart(2, "0")}`;
+// }
 
 function updateGauge(totalScale: number, availableScale: number) {
   const proportion = (availableScale / totalScale) * 100;
@@ -66,88 +66,88 @@ function updateGauge(totalScale: number, availableScale: number) {
 // 0. GET DATA: Set up a JSON object for sample events data. each event will have a start and end time. the start and end times will be in the same day.
 //NOTE: maybe the periods are also data to get from somewhere?
 
-const eventsDataJSON = [
-  {
-    start: {
-      dateTime: "2024-03-20T08:30:00-05:00",
-      timeZone: "America/New_York",
-    },
-    end: {
-      dateTime: "2024-03-20T10:00:00-05:00",
-      timeZone: "America/New_York",
-    },
-  },
-  {
-    start: {
-      dateTime: "2024-03-20T09:30:00-05:00",
-      timeZone: "America/New_York",
-    },
-    end: {
-      dateTime: "2024-03-20T11:00:00-05:00",
-      timeZone: "America/New_York",
-    },
-  },
-  {
-    start: {
-      dateTime: "2024-03-20T12:00:00-05:00",
-      timeZone: "America/New_York",
-    },
-    end: {
-      dateTime: "2024-03-20T13:00:00-05:00",
-      timeZone: "America/New_York",
-    },
-  },
-  {
-    start: {
-      dateTime: "2024-03-20T14:00:00-05:00",
-      timeZone: "America/New_York",
-    },
-    end: {
-      dateTime: "2024-03-20T15:00:00-05:00",
-      timeZone: "America/New_York",
-    },
-  },
-  {
-    start: {
-      dateTime: "2024-03-20T16:30:00-05:00",
-      timeZone: "America/New_York",
-    },
-    end: {
-      dateTime: "2024-03-20T17:30:00-05:00",
-      timeZone: "America/New_York",
-    },
-  },
-  {
-    start: {
-      dateTime: "2024-03-20T18:00:00-05:00",
-      timeZone: "America/New_York",
-    },
-    end: {
-      dateTime: "2024-03-20T19:00:00-05:00",
-      timeZone: "America/New_York",
-    },
-  },
-  {
-    start: {
-      dateTime: "2024-03-20T20:30:00-05:00",
-      timeZone: "America/New_York",
-    },
-    end: {
-      dateTime: "2024-03-20T21:30:00-05:00",
-      timeZone: "America/New_York",
-    },
-  },
-  {
-    start: {
-      dateTime: "2024-03-20T22:00:00-05:00",
-      timeZone: "America/New_York",
-    },
-    end: {
-      dateTime: "2024-03-20T22:30:00-05:00",
-      timeZone: "America/New_York",
-    },
-  },
-];
+// const eventsDataJSON = [
+//   {
+//     start: {
+//       dateTime: "2024-03-20T08:30:00-05:00",
+//       timeZone: "America/New_York",
+//     },
+//     end: {
+//       dateTime: "2024-03-20T10:00:00-05:00",
+//       timeZone: "America/New_York",
+//     },
+//   },
+//   {
+//     start: {
+//       dateTime: "2024-03-20T09:30:00-05:00",
+//       timeZone: "America/New_York",
+//     },
+//     end: {
+//       dateTime: "2024-03-20T11:00:00-05:00",
+//       timeZone: "America/New_York",
+//     },
+//   },
+//   {
+//     start: {
+//       dateTime: "2024-03-20T12:00:00-05:00",
+//       timeZone: "America/New_York",
+//     },
+//     end: {
+//       dateTime: "2024-03-20T13:00:00-05:00",
+//       timeZone: "America/New_York",
+//     },
+//   },
+//   {
+//     start: {
+//       dateTime: "2024-03-20T14:00:00-05:00",
+//       timeZone: "America/New_York",
+//     },
+//     end: {
+//       dateTime: "2024-03-20T15:00:00-05:00",
+//       timeZone: "America/New_York",
+//     },
+//   },
+//   {
+//     start: {
+//       dateTime: "2024-03-20T16:30:00-05:00",
+//       timeZone: "America/New_York",
+//     },
+//     end: {
+//       dateTime: "2024-03-20T17:30:00-05:00",
+//       timeZone: "America/New_York",
+//     },
+//   },
+//   {
+//     start: {
+//       dateTime: "2024-03-20T18:00:00-05:00",
+//       timeZone: "America/New_York",
+//     },
+//     end: {
+//       dateTime: "2024-03-20T19:00:00-05:00",
+//       timeZone: "America/New_York",
+//     },
+//   },
+//   {
+//     start: {
+//       dateTime: "2024-03-20T20:30:00-05:00",
+//       timeZone: "America/New_York",
+//     },
+//     end: {
+//       dateTime: "2024-03-20T21:30:00-05:00",
+//       timeZone: "America/New_York",
+//     },
+//   },
+//   {
+//     start: {
+//       dateTime: "2024-03-20T22:00:00-05:00",
+//       timeZone: "America/New_York",
+//     },
+//     end: {
+//       dateTime: "2024-03-20T22:30:00-05:00",
+//       timeZone: "America/New_York",
+//     },
+//   },
+// ];
 
 // 1. Set up defaults for the current time and time zone.
 const nowTemporal = Temporal.Now.zonedDateTimeISO().toString();
