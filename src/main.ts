@@ -1,6 +1,6 @@
 import { Temporal } from "temporal-polyfill";
 import { periods } from "./periods";
-import { eventsDataJSON } from "./eventsdata";
+// import { eventsDataJSON } from "./eventsdata";
 import "./style.css";
 
 // Your existing code that uses the periods object...import "./style.css";
