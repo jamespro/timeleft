@@ -3,10 +3,10 @@ import { periods } from "./periods";
 // import { eventsDataJSON } from "./eventsdata";
 import "./style.css";
 
-const eventsData = eventsDataJSON;
-if (eventsData.length === 0) {
-  console.log(eventsData);
-}
+// const eventsData = eventsDataJSON;
+// if (eventsData.length === 0) {
+//   console.log(eventsData);
+// }
 
 // Your existing code that uses the periods object...import "./style.css";
 
