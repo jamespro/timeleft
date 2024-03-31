@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "serve": "^14.2.1",
+    "@flydotio/dockerfile": "^0.5.4",
     "typescript": "^5.2.2",
     "vite": "^5.1.0"
   },

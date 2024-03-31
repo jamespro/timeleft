@@ -1,6 +1,6 @@
 import { Temporal } from "temporal-polyfill";
 import { periods } from "./periods";
-import { eventsDataJSON } from "./eventsdata";
+// import { eventsDataJSON } from "./eventsdata";
 import "./style.css";
 
 const eventsData = eventsDataJSON;
