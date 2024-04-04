@@ -107,12 +107,99 @@ function getPeriodTotalDuration(
 ): Temporal.Duration {
   return periodStart.until(periodEnd);
 }
+
 function getPeriodRemainingDuration(
   nowTime: Temporal.PlainTime,
   periodEnd: Temporal.PlainTime
 ): Temporal.Duration {
   return nowTime.until(periodEnd);
 }
+
+function clipEvents(
+  periodStart: Temporal.PlainTime,
+  periodEnd: Temporal.PlainTime,
+  eventsData: { start: Temporal.PlainTime; end: Temporal.PlainTime }[]
+) {
+  return eventsData
+    .map((event) => {
+      return {
+        start: Temporal.PlainTime.from(event.start),
+        end: Temporal.PlainTime.from(event.end),
+      };
+    })
+    .filter(
+      (event) =>
+        Temporal.PlainTime.compare(event.end, periodStart) > 0 &&
+        Temporal.PlainTime.compare(event.start, periodEnd) < 0
+    )
+    .map((event) => {
+      return {
+        start:
+          Temporal.PlainTime.compare(event.start, periodStart) <= 0
+            ? event.start
+            : periodStart,
+        end:
+          Temporal.PlainTime.compare(event.end, periodEnd) >= 0
+            ? event.end
+            : periodStart,
+      };
+    })
+    .sort((a, b) => Temporal.PlainTime.compare(a.start, b.start));
+}
+
+function mergeEvents(
+  events: { start: Temporal.PlainTime; end: Temporal.PlainTime }[]
+): { start: Temporal.PlainTime; end: Temporal.PlainTime }[] {
+  const mergedEvents: { start: Temporal.PlainTime; end: Temporal.PlainTime }[] =
+    [];
+  let lastEvent: null | { start: Temporal.PlainTime; end: Temporal.PlainTime } =
+    null;
+
+  events.forEach((event) => {
+    // if there is no last event or the current event starts after the last event ends
+    if (
+      !lastEvent ||
+      Temporal.PlainTime.compare(event.start, lastEvent.end) > 0
+    ) {
+      // add the current event to the merged events
+      mergedEvents.push(event);
+      // update the last event to the current event
+      lastEvent = event;
+    } else if (Temporal.PlainTime.compare(event.end, lastEvent.end) > 0) {
+      // else if the current event ends after the last event ends
+      // then update the end time of the last event to the end time of the current event
+      lastEvent.end = event.end;
+    }
+  });
+  // return the merged events array
+  return mergedEvents;
+}
+
+function getPeriodAvailableDuration(
+  nowTime: Temporal.PlainTime,
+  periodEnd: Temporal.PlainTime,
+  eventsData: { start: Temporal.PlainTime; end: Temporal.PlainTime }[]
+): Temporal.Duration {
+  let remainingDuration = nowTime.until(periodEnd);
+  // using EventsData
+  // loop through eventsData to remove any events that end before the nowTime or start after the periodEnd. Then modify any events that start before the nowTime and change the start time to nowTime. Then modify any events that end after the periodEnd and change the end time to periodEnd. This will be the "clippedEvents"
+  let clippedEvents = clipEvents(periodStart, periodEnd, eventsData);
+
+  // now create a function "mergeEvents" to merge the clippedEvents so that no events overlap, into an array that can be used to calculate the unavailable time
+
+  let mergedEvents = mergeEvents(clippedEvents);
+
+  let unavailableTime = 0;
+  let availableTime = remainingDuration - unavailableTime;
+  return availableTime;
+}
+
+const periodAvailableDuration = getPeriodAvailableDuration(
+  nowTime,
+  periodEnd,
+  eventsDataJSON
+);
+
 const periodTotalDuration = getPeriodTotalDuration(periodStart, periodEnd);
 const periodRemainingDuration = getPeriodRemainingDuration(nowTime, periodEnd);
 
