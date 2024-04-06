@@ -108,12 +108,12 @@ function getPeriodTotalDuration(
   return periodStart.until(periodEnd);
 }
 
-function getPeriodRemainingDuration(
-  nowTime: Temporal.PlainTime,
-  periodEnd: Temporal.PlainTime
-): Temporal.Duration {
-  return nowTime.until(periodEnd);
-}
+// function getPeriodRemainingDuration(
+//   nowTime: Temporal.PlainTime,
+//   periodEnd: Temporal.PlainTime
+// ): Temporal.Duration {
+//   return nowTime.until(periodEnd);
+// }
 
 function clipEvents(
   clipStart: Temporal.PlainTime,
@@ -256,7 +256,7 @@ const periodAvailableDuration = getPeriodAvailableDuration(
 );
 
 const periodTotalDuration = getPeriodTotalDuration(periodStart, periodEnd);
-const periodRemainingDuration = getPeriodRemainingDuration(nowTime, periodEnd);
+//const periodRemainingDuration = getPeriodRemainingDuration(nowTime, periodEnd);
 
 // let timeLeftDisplay = formatDuration(periodRemainingDuration);
 let timeLeftDisplay = formatDuration(periodAvailableDuration);
@@ -276,10 +276,10 @@ function refresh() {
     // let periodStart = getPeriodStart(nowTime, startTimes); //don't need to get a new periodStart?
     let periodEnd = getPeriodEnd(nowTime, endTimes);
     const periodTotalDuration = getPeriodTotalDuration(periodStart, periodEnd);
-    const periodRemainingDuration = getPeriodRemainingDuration(
-      nowTime,
-      periodEnd
-    );
+    // const periodRemainingDuration = getPeriodRemainingDuration(
+    //   nowTime,
+    //   periodEnd
+    // );
     const periodAvailableDuration = getPeriodAvailableDuration(
       nowTime,
       periodEnd,
