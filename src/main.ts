@@ -32,7 +32,7 @@ console.info(`now time zone ID: ${nowTimeZone}`);
 
 // 2. Set variables with values for the period start and end dates and times.
 
-// example how to adjust one specific time:
+// Temporal APIexample how to adjust one specific time:
 //periods.prime.end = periods.prime.end.add({ minutes: 8 });
 
 let periodStart = periods.day.start;
@@ -41,14 +41,14 @@ let periodEnd = periods.day.end;
 // 3. Pass the current period start and end times into the functions to calculate the next period start and end times.
 
 // console.warn(`nowTime: ${nowTime.toString()}`);
+
 // 3a. start time
 // Put the start times into an array to loop through and compare
-
 // use periods to get the start times for each period
 
 const startTimes = Object.values(periods).map((period) => period.start);
 
-// Update periodStart to the closest past time
+// Update periodStart to the closest PAST time
 function getPeriodStart(
   nowTime: Temporal.PlainTime,
   startTimes: Temporal.PlainTime[]
@@ -95,7 +95,7 @@ function getPeriodEnd(
   return periodEnd;
 }
 
-// Update periodEnd to the closest future time
+// Update periodEnd to the closest FUTURE time
 periodEnd = getPeriodEnd(nowTime, endTimes);
 
 console.warn(`periodStart: ${periodStart.toString()}`);
@@ -116,35 +116,55 @@ function getPeriodRemainingDuration(
 }
 
 function clipEvents(
-  periodStart: Temporal.PlainTime,
-  periodEnd: Temporal.PlainTime,
+  clipStart: Temporal.PlainTime,
+  clipEnd: Temporal.PlainTime,
   eventsData: { start: Temporal.PlainTime; end: Temporal.PlainTime }[]
 ) {
-  return eventsData
+  // console.log("unfiltered: ", eventsData);
+  // console.table(
+  //   eventsData.map((event) => ({
+  //     Start: `${event.start.hour}:${event.start.minute}`,
+  //     End: `${event.end.hour}:${event.end.minute}`,
+  //   }))
+  // );
+
+  let result = eventsData
     .map((event) => {
       return {
         start: Temporal.PlainTime.from(event.start),
         end: Temporal.PlainTime.from(event.end),
       };
     })
-    .filter(
-      (event) =>
-        Temporal.PlainTime.compare(event.end, periodStart) > 0 &&
-        Temporal.PlainTime.compare(event.start, periodEnd) < 0
-    )
+    // clip the events to the period. If the start time is before the period start, set it to the period start. If the end time is after the period end, set it to the period end.
     .map((event) => {
       return {
         start:
-          Temporal.PlainTime.compare(event.start, periodStart) <= 0
-            ? event.start
-            : periodStart,
+          Temporal.PlainTime.compare(event.start, clipStart) < 0
+            ? clipStart
+            : event.start,
         end:
-          Temporal.PlainTime.compare(event.end, periodEnd) >= 0
-            ? event.end
-            : periodStart,
+          Temporal.PlainTime.compare(event.end, clipEnd) > 0
+            ? clipEnd
+            : event.end,
       };
     })
-    .sort((a, b) => Temporal.PlainTime.compare(a.start, b.start));
+    .sort((a, b) => Temporal.PlainTime.compare(a.start, b.start))
+    // filter out the events that are not in the period
+    .filter(
+      (event) =>
+        Temporal.PlainTime.compare(event.end, clipStart) > 0 &&
+        Temporal.PlainTime.compare(event.start, clipEnd) < 0
+    );
+
+  // console.log("clippedEvents: ");
+  // console.table(
+  //   result.map((event) => ({
+  //     Start: `${event.start.hour}:${event.start.minute}`,
+  //     End: `${event.end.hour}:${event.end.minute}`,
+  //   }))
+  // );
+
+  return result;
 }
 
 function mergeEvents(
@@ -171,26 +191,61 @@ function mergeEvents(
       lastEvent.end = event.end;
     }
   });
-  // return the merged events array
+  // console.log("mergedEvents: ");
+  // console.table(
+  //   mergedEvents.map((event) => ({
+  //     Start: `${event.start.hour}:${event.start.minute}`,
+  //     End: `${event.end.hour}:${event.end.minute}`,
+  //   }))
+  // );
   return mergedEvents;
 }
 
 function getPeriodAvailableDuration(
   nowTime: Temporal.PlainTime,
   periodEnd: Temporal.PlainTime,
-  eventsData: { start: Temporal.PlainTime; end: Temporal.PlainTime }[]
+  eventsData: {
+    start: { dateTime: string; timeZone: string };
+    end: { dateTime: string; timeZone: string };
+  }[]
 ): Temporal.Duration {
   let remainingDuration = nowTime.until(periodEnd);
   // using EventsData
-  // loop through eventsData to remove any events that end before the nowTime or start after the periodEnd. Then modify any events that start before the nowTime and change the start time to nowTime. Then modify any events that end after the periodEnd and change the end time to periodEnd. This will be the "clippedEvents"
-  let clippedEvents = clipEvents(periodStart, periodEnd, eventsData);
+  const events = eventsData.map((event) => {
+    return {
+      start: Temporal.PlainTime.from(event.start.dateTime),
+      end: Temporal.PlainTime.from(event.end.dateTime),
+    };
+  });
+  // loop through eventsData to remove any events that end before the nowTime or start after the periodEnd. Then modify any events that start before the nowTime and change the start time to nowTime. Then modify any events that end after the periodEnd and change the end time to periodEnd. This will be "clippedEvents"
+  let clippedEvents = clipEvents(nowTime, periodEnd, events);
 
   // now create a function "mergeEvents" to merge the clippedEvents so that no events overlap, into an array that can be used to calculate the unavailable time
 
   let mergedEvents = mergeEvents(clippedEvents);
 
-  let unavailableTime = 0;
-  let availableTime = remainingDuration - unavailableTime;
+  // so now we have "mergedEvents" that can be used to calculate the unavailable time as a Temporal.Duration
+
+  // loop through mergedEvents to calculate the unavailable time as a Temporal.Duration; default value is 0 as a Duration
+  let unavailableTime = mergedEvents.reduce(
+    (acc, event) => {
+      // console.log(Temporal.PlainTime.compare(nowTime, event.end));
+      // only count events if the event end time is after the nowTime
+      if (Temporal.PlainTime.compare(nowTime, event.end) < 0) {
+        // add to the unavailable time: the duration of time from event start to the event end time
+        return (acc = acc.add(event.end.since(event.start)));
+      }
+      return acc;
+    },
+    Temporal.Duration.from({
+      seconds: 0,
+    })
+  );
+
+  let availableTime = remainingDuration.subtract(unavailableTime);
+  // console.log("unavailableTime: " + unavailableTime.toString());
+  // console.log("remainingDuration: " + remainingDuration.toString());
+  // console.log("availableTime: " + availableTime.toString());
   return availableTime;
 }
 
@@ -203,11 +258,12 @@ const periodAvailableDuration = getPeriodAvailableDuration(
 const periodTotalDuration = getPeriodTotalDuration(periodStart, periodEnd);
 const periodRemainingDuration = getPeriodRemainingDuration(nowTime, periodEnd);
 
-let timeLeftDisplay = formatDuration(periodRemainingDuration);
+// let timeLeftDisplay = formatDuration(periodRemainingDuration);
+let timeLeftDisplay = formatDuration(periodAvailableDuration);
 
 //TODO: You can ADD a "availableProportion" instead of replacing this one, so that you could show both available and remaining
 const remainingProportion =
-  (Temporal.Duration.from(periodRemainingDuration).total("seconds") /
+  (Temporal.Duration.from(periodAvailableDuration).total("seconds") /
     Temporal.Duration.from(periodTotalDuration).total("seconds")) *
   100;
 
@@ -224,14 +280,19 @@ function refresh() {
       nowTime,
       periodEnd
     );
+    const periodAvailableDuration = getPeriodAvailableDuration(
+      nowTime,
+      periodEnd,
+      eventsDataJSON
+    );
 
     document.getElementById("timeLeftDisplay")!.innerHTML = formatDuration(
-      periodRemainingDuration
+      periodAvailableDuration
     );
 
     //TODO: You can ADD a "availableProportion" instead of replacing this one, so that you could show both available and remaining
     const remainingProportion =
-      (Temporal.Duration.from(periodRemainingDuration).total("seconds") /
+      (Temporal.Duration.from(periodAvailableDuration).total("seconds") /
         Temporal.Duration.from(periodTotalDuration).total("seconds")) *
       100;
     const gauge = document.getElementById("timeGauge");
