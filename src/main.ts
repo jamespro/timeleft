@@ -301,9 +301,16 @@ function refresh() {
       100;
     const gauge = document.getElementById("timeGauge");
     gauge!.style.height = remainingProportion + "%";
-    if (remainingProportion < 4) {
+    if (
+      remainingProportion < 4 ||
+      Temporal.Duration.from(periodAvailableDuration).total("minutes") < 10
+    ) {
       gauge!.style.backgroundColor = "#990000";
     }
+    // if (periodStart) {
+    //   document.getElementById("timeGaugeContainer")!.style.backgroundColor =
+    //     "#990000";
+    // }
 
     refresh();
   }, 200);
