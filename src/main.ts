@@ -1,7 +1,7 @@
 import { Temporal } from "temporal-polyfill";
 import { periods } from "./periods";
 import { eventsDataJSON } from "./eventsdata";
-import "./style.css";
+// import "./style.css";
 
 //For Fly.io, you can set environment variables through their web interface or CLI
 //const clientId = import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID;
@@ -301,6 +301,9 @@ function refresh() {
       100;
     const gauge = document.getElementById("timeGauge");
     gauge!.style.height = remainingProportion + "%";
+    if (remainingProportion < 4) {
+      gauge!.style.backgroundColor = "#990000";
+    }
 
     refresh();
   }, 200);
@@ -313,7 +316,7 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = /* html */ `
       <div id="timeLeftContainer">
         <h1 id="timeLeftDisplay">${timeLeftDisplay}</h1>
       </div>
-      <div id="timeGaugeContainer" style="width: 30px; height: 200px; background-color: #ddd; position: relative;">
+      <div id="timeGaugeContainer" style="width: 300px; height: 200px; background-color: #ddd; position: relative;">
       <div id="timeGauge" style="width: 100%; height: ${remainingProportion}%; background-color: #4CAF50; position: absolute; bottom: 0;"></div>
       </div>
       <p id="timeText"></p>
