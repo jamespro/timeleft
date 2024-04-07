@@ -7,10 +7,11 @@ import { eventsDataJSON } from "./eventsdata";
 //const clientId = import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID;
 //const clientSecret = import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_SECRET;
 
+//Where should we restrict to only today's events? (What if you want to work after midnight?)
 const eventsData = eventsDataJSON;
-if (eventsData.length === 0) {
-  console.log(eventsData);
-}
+// if (eventsData.length === 0) {
+//   console.log(eventsData);
+// }
 
 //NOTE: USE JavaScript Temporal API for all dates and calculations. USE Google Calendar API format for dates. USE ISO 8601 format for time.
 
@@ -215,12 +216,46 @@ function getPeriodAvailableDuration(
 ): Temporal.Duration {
   let remainingDuration = nowTime.until(periodEnd);
   // using EventsData
-  const events = eventsData.map((event) => {
-    return {
-      start: Temporal.PlainTime.from(event.start.dateTime),
-      end: Temporal.PlainTime.from(event.end.dateTime),
-    };
-  });
+  // extract start and end times only, into PlainTime -- removes the date information
+  // FIRST, need to filter out any events that are not the same day as the current period
+  // FUTURE: DO WE INCLUDE DATE WHEN COMPARING? JUST USE ZonedDateTime FOR PeriodStart and PeriodEnd?
+  const events = eventsData
+    //this was comparing by TIME as well as DATE, so it was doing something unexpected... I switched to comparing by PlainDate, by adding ".toPlainDate()" and using Temporal.PlainDate.compare() -- if you want to switch it back.
+    .filter(
+      (event) =>
+        Temporal.PlainDate.compare(
+          Temporal.Instant.from(event.start.dateTime)
+            .toZonedDateTime({
+              timeZone: event.start.timeZone,
+              calendar: "iso8601",
+            })
+            .toPlainDate(),
+          now.toPlainDate()
+        ) == 0 &&
+        Temporal.PlainDate.compare(
+          Temporal.Instant.from(event.end.dateTime)
+            .toZonedDateTime({
+              timeZone: event.end.timeZone,
+              calendar: "iso8601",
+            })
+            .toPlainDate(),
+          now.toPlainDate()
+        ) == 0
+    )
+    .map((event) => {
+      return {
+        start: Temporal.PlainTime.from(event.start.dateTime),
+        end: Temporal.PlainTime.from(event.end.dateTime),
+      };
+    });
+  // console.log("filteredEvents: ");
+  // console.table(
+  //   events.map((event) => ({
+  //     Start: `${event.start.hour}:${event.start.minute}`,
+  //     End: `${event.end.hour}:${event.end.minute}`,
+  //   }))
+  // );
+
   // loop through eventsData to remove any events that end before the nowTime or start after the periodEnd. Then modify any events that start before the nowTime and change the start time to nowTime. Then modify any events that end after the periodEnd and change the end time to periodEnd. This will be "clippedEvents"
   let clippedEvents = clipEvents(nowTime, periodEnd, events);
 
@@ -247,8 +282,8 @@ function getPeriodAvailableDuration(
   );
 
   let availableTime = remainingDuration.subtract(unavailableTime);
-  // console.log("unavailableTime: " + unavailableTime.toString());
   // console.log("remainingDuration: " + remainingDuration.toString());
+  // console.log("unavailableTime: " + unavailableTime.toString());
   // console.log("availableTime: " + availableTime.toString());
   return availableTime;
 }
@@ -256,7 +291,7 @@ function getPeriodAvailableDuration(
 const periodAvailableDuration = getPeriodAvailableDuration(
   nowTime,
   periodEnd,
-  eventsDataJSON
+  eventsData
 );
 
 const periodTotalDuration = getPeriodTotalDuration(periodStart, periodEnd);
@@ -280,6 +315,9 @@ function refresh() {
     // let periodStart = getPeriodStart(nowTime, startTimes); //don't need to get a new periodStart?
     let periodEnd = getPeriodEnd(nowTime, endTimes);
     const periodTotalDuration = getPeriodTotalDuration(periodStart, periodEnd);
+    // *
+    // console.log("periodTotalDuration: " + periodTotalDuration.toString());
+
     // const periodRemainingDuration = getPeriodRemainingDuration(
     //   nowTime,
     //   periodEnd
@@ -287,9 +325,12 @@ function refresh() {
     const periodAvailableDuration = getPeriodAvailableDuration(
       nowTime,
       periodEnd,
-      eventsDataJSON
+      eventsData
     );
-
+    // *
+    // console.log(
+    //   "periodAvailableDuration: " + periodAvailableDuration.toString()
+    // );
     document.getElementById("timeLeftDisplay")!.innerHTML = formatDuration(
       periodAvailableDuration
     );
@@ -306,11 +347,9 @@ function refresh() {
       Temporal.Duration.from(periodAvailableDuration).total("minutes") < 10
     ) {
       gauge!.style.backgroundColor = "#990000";
+    } else {
+      gauge!.style.backgroundColor = "#4CAF50";
     }
-    // if (periodStart) {
-    //   document.getElementById("timeGaugeContainer")!.style.backgroundColor =
-    //     "#990000";
-    // }
 
     refresh();
   }, 200);

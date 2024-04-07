@@ -5,27 +5,37 @@ export const eventsDataJSON = [
       timeZone: "America/New_York",
     },
     end: {
-      dateTime: "2024-04-06T10:01:00-04:00",
+      dateTime: "2024-04-06T09:19:00-04:00",
       timeZone: "America/New_York",
     },
   },
   {
     start: {
-      dateTime: "2024-04-06T09:30:00-04:00",
+      dateTime: "2024-04-06T10:30:00-04:00",
       timeZone: "America/New_York",
     },
     end: {
-      dateTime: "2024-04-06T11:00:00-04:00",
+      dateTime: "2024-04-06T10:58:00-04:00",
       timeZone: "America/New_York",
     },
   },
   {
     start: {
-      dateTime: "2024-04-06T12:00:00-04:00",
+      dateTime: "2024-04-07T12:00:00-04:00",
       timeZone: "America/New_York",
     },
     end: {
-      dateTime: "2024-04-06T13:00:00-04:00",
+      dateTime: "2024-04-07T13:00:00-04:00",
+      timeZone: "America/New_York",
+    },
+  },
+  {
+    start: {
+      dateTime: "2024-04-08T12:00:00-04:00",
+      timeZone: "America/New_York",
+    },
+    end: {
+      dateTime: "2024-04-08T13:00:00-04:00",
       timeZone: "America/New_York",
     },
   },
@@ -35,13 +45,13 @@ export const eventsDataJSON = [
       timeZone: "America/New_York",
     },
     end: {
-      dateTime: "2024-04-06T15:00:00-04:00",
+      dateTime: "2024-04-06T14:20:00-04:00",
       timeZone: "America/New_York",
     },
   },
   {
     start: {
-      dateTime: "2024-04-06T16:30:00-04:00",
+      dateTime: "2024-04-06T16:45:00-04:00",
       timeZone: "America/New_York",
     },
     end: {
