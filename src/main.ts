@@ -3,6 +3,10 @@ import { periods } from "./periods";
 import { eventsDataJSON } from "./eventsdata";
 import "./style.css";
 
+//For Fly.io, you can set environment variables through their web interface or CLI
+//const clientId = import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_ID;
+//const clientSecret = import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_SECRET;
+
 const eventsData = eventsDataJSON;
 if (eventsData.length === 0) {
   console.log(eventsData);
