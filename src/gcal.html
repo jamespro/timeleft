@@ -145,6 +145,7 @@
           document.getElementById('content').innerText = 'No events found.';
           return;
         }
+        console.log(events);
         // Flatten to string to display
         const output = events.reduce(
             (str, event) => `${str}${event.summary} (${event.start.dateTime || event.start.date})\n`,
