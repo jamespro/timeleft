@@ -21,16 +21,6 @@ export const eventsDataJSON = [
   },
   {
     start: {
-      dateTime: "2024-04-07T12:00:00-04:00",
-      timeZone: "America/New_York",
-    },
-    end: {
-      dateTime: "2024-04-07T13:00:00-04:00",
-      timeZone: "America/New_York",
-    },
-  },
-  {
-    start: {
       dateTime: "2024-04-08T12:00:00-04:00",
       timeZone: "America/New_York",
     },
@@ -41,21 +31,31 @@ export const eventsDataJSON = [
   },
   {
     start: {
-      dateTime: "2024-04-06T14:00:00-04:00",
+      dateTime: "2024-04-09T12:00:00-04:00",
       timeZone: "America/New_York",
     },
     end: {
-      dateTime: "2024-04-06T14:20:00-04:00",
+      dateTime: "2024-04-09T13:00:00-04:00",
       timeZone: "America/New_York",
     },
   },
   {
     start: {
-      dateTime: "2024-04-06T16:45:00-04:00",
+      dateTime: "2024-04-07T14:00:00-04:00",
       timeZone: "America/New_York",
     },
     end: {
-      dateTime: "2024-04-06T17:30:00-04:00",
+      dateTime: "2024-04-07T14:20:00-04:00",
+      timeZone: "America/New_York",
+    },
+  },
+  {
+    start: {
+      dateTime: "2024-04-07T16:45:00-04:00",
+      timeZone: "America/New_York",
+    },
+    end: {
+      dateTime: "2024-04-07T17:30:00-04:00",
       timeZone: "America/New_York",
     },
   },
@@ -81,11 +81,11 @@ export const eventsDataJSON = [
   },
   {
     start: {
-      dateTime: "2024-04-06T18:40:00-04:00",
+      dateTime: "2024-04-08T18:40:00-04:00",
       timeZone: "America/New_York",
     },
     end: {
-      dateTime: "2024-04-06T18:55:00-04:00",
+      dateTime: "2024-04-08T18:55:00-04:00",
       timeZone: "America/New_York",
     },
   },

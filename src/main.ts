@@ -216,6 +216,8 @@ function getPeriodAvailableDuration(
 ): Temporal.Duration {
   let remainingDuration = nowTime.until(periodEnd);
   // using EventsData
+  // console.log("getperiodavailableduration:");
+  // console.log(eventsData);
   // extract start and end times only, into PlainTime -- removes the date information
   // FIRST, need to filter out any events that are not the same day as the current period
   // FUTURE: DO WE INCLUDE DATE WHEN COMPARING? JUST USE ZonedDateTime FOR PeriodStart and PeriodEnd?
@@ -308,7 +310,12 @@ const remainingProportion =
 
 // new function to update every 100 milliseconds using setTimeout. Will update all the times and the UI elements
 // using setTimeout, will not use setInterval
-function refresh() {
+function refresh(
+  eventsData: {
+    start: { dateTime: string; timeZone: string };
+    end: { dateTime: string; timeZone: string };
+  }[]
+) {
   setTimeout(() => {
     const nowTime = Temporal.Now.zonedDateTimeISO().toPlainTime();
     // console.log("refreshing...");
@@ -351,7 +358,7 @@ function refresh() {
       gauge!.style.backgroundColor = "#4CAF50";
     }
 
-    refresh();
+    refresh(eventsData);
   }, 200);
 }
 
@@ -371,4 +378,4 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = /* html */ `
   </div>
 `;
 
-refresh();
+refresh(eventsData);
