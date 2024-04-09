@@ -27,12 +27,6 @@ if (retrievedDataJSON) {
 //   console.log(eventsData);
 // }
 
-//Where should we restrict to only today's events? (What if you want to work after midnight?)
-// const eventsData = eventsDataJSON;
-// if (eventsData.length === 0) {
-//   console.log(eventsData);
-// }
-
 //NOTE: USE JavaScript Temporal API for all dates and calculations. USE Google Calendar API format for dates. USE ISO 8601 format for time.
 
 //Functions for calculating time left
@@ -241,6 +235,9 @@ function getPeriodAvailableDuration(
   // extract start and end times only, into PlainTime -- removes the date information
   // FIRST, need to filter out any events that are not the same day as the current period
   // FUTURE: DO WE INCLUDE DATE WHEN COMPARING? JUST USE ZonedDateTime FOR PeriodStart and PeriodEnd?
+
+  // console.log("inside getPeriodAvailableDuration");
+  // console.log(eventsData);
   const events = eventsData
     //this was comparing by TIME as well as DATE, so it was doing something unexpected... I switched to comparing by PlainDate, by adding ".toPlainDate()" and using Temporal.PlainDate.compare() -- if you want to switch it back.
     .filter(
@@ -330,14 +327,15 @@ const remainingProportion =
 
 // new function to update every 100 milliseconds using setTimeout. Will update all the times and the UI elements
 // using setTimeout, will not use setInterval
-function refresh(
-  eventsData: {
-    start: { dateTime: string; timeZone: string };
-    end: { dateTime: string; timeZone: string };
-  }[]
-) {
+function refresh() {
   setTimeout(() => {
     const nowTime = Temporal.Now.zonedDateTimeISO().toPlainTime();
+    const retrievedDataJSON = localStorage.getItem("eventsData");
+    // Parse the string back to an object
+    if (retrievedDataJSON) {
+      eventsData = JSON.parse(retrievedDataJSON);
+    }
+
     // console.log("refreshing...");
     // let periodStart = getPeriodStart(nowTime, startTimes); //don't need to get a new periodStart?
     let periodEnd = getPeriodEnd(nowTime, endTimes);
@@ -349,6 +347,9 @@ function refresh(
     //   nowTime,
     //   periodEnd
     // );
+    // NOTE: DEBUG
+    // console.log("inside refresh:");
+    // console.log(eventsData);
     const periodAvailableDuration = getPeriodAvailableDuration(
       nowTime,
       periodEnd,
@@ -378,7 +379,7 @@ function refresh(
       gauge!.style.backgroundColor = "#4CAF50";
     }
 
-    refresh(eventsData);
+    refresh();
   }, 200);
 }
 
@@ -398,4 +399,4 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = /* html */ `
   </div>
 `;
 
-refresh(eventsData);
+refresh();

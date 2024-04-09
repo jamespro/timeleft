@@ -91,7 +91,7 @@
           }
           document.getElementById('signout_button').style.visibility = 'visible';
           document.getElementById('authorize_button').innerText = 'Refresh';
-          await listUpcomingEvents();
+          // await listUpcomingEvents();
           await updateEventsData();
         };
 
@@ -146,7 +146,7 @@
           document.getElementById('content').innerText = 'No events found.';
           return;
         }
-        console.log(events);
+        // console.log(events);
         // Flatten to string to display
         const output = events.reduce(
             (str, event) => `${str}${event.summary} (${event.start.dateTime || event.start.date})\n`,
@@ -162,7 +162,7 @@
             'timeMin': (new Date()).toISOString(),
             'showDeleted': false,
             'singleEvents': true,
-            'maxResults': 10,
+            'maxResults': 24,
             'orderBy': 'startTime',
           };
           response = await gapi.client.calendar.events.list(request);
@@ -177,13 +177,17 @@
         getEvents().then((response) => {
           // update eventsData to use this instead of eventsDataJSON
           calEventsData = response;
+          console.log('calEventsData updated');
           console.log(calEventsData);
           // update the UI
           // if I trigger refresh, will it be using this new data? 
           // trigger refresh to have it use this new data
           // either update the data that is being referenced when refresh is run, maybe a global variable?
           // or trigger refresh directly and send it this new data
-          let eventsData = calEventsData.map((event) => {
+          // Check if both start and end have the dateTime property! for those all-day events or just reminders
+          let eventsData = calEventsData.filter(event => 
+            event.start.dateTime && event.end.dateTime
+          ).map((event) => {
             return {
               start: {
                 dateTime: event.start.dateTime,
@@ -195,8 +199,10 @@
               }
             } 
           });
-           
-          refresh(eventsData);
+          localStorage.setItem("eventsData", JSON.stringify(eventsData));
+          console.log('eventsData updated');
+           console.log(eventsData);
+          // refresh();
 
         })
       }
