@@ -8,7 +8,27 @@ import { eventsDataJSON } from "./eventsdata";
 //const clientSecret = import.meta.env.VITE_GOOGLE_OAUTH_CLIENT_SECRET;
 
 //Where should we restrict to only today's events? (What if you want to work after midnight?)
-const eventsData = eventsDataJSON;
+// Storing data in LocalStorage
+localStorage.setItem("eventsData", JSON.stringify(eventsDataJSON));
+let eventsData: {
+  start: { dateTime: string; timeZone: string };
+  end: { dateTime: string; timeZone: string };
+}[] = [];
+
+// Retrieving data from LocalStorage
+const retrievedDataJSON = localStorage.getItem("eventsData");
+// Parse the string back to an object
+if (retrievedDataJSON) {
+  eventsData = JSON.parse(retrievedDataJSON);
+}
+
+// const eventsData = eventsDataJSON;
+// if (eventsData.length === 0) {
+//   console.log(eventsData);
+// }
+
+//Where should we restrict to only today's events? (What if you want to work after midnight?)
+// const eventsData = eventsDataJSON;
 // if (eventsData.length === 0) {
 //   console.log(eventsData);
 // }
