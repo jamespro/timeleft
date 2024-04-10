@@ -182,6 +182,25 @@ _MAKE AN ARRAY OR DATA STRUCTURE THAT ACCUMULATES THE TIMES, THAT MERGES ANY OVE
 
 # Log
 
+## 2024-04-09
+
+- can login with google for the calendar
+
+### TODO
+
+- Google API: How qualify to verify, for non-experimental access? e.g. privacy policy. Check my other project to see if I did it for that.
+  - what was the other project?
+- login to thinkabout, by github/discord, to fix???
+- how to organize the JS into modules, files?
+- PassportJS? check other project to see how that's done. probably a different project
+- To remember be and not need full login
+- Calendar: Pick the calendar(s), or do all calendars? Also, put FocusMate onto different default calendar
+- UI: render HTML another way? Template engine? Put into HTML and just update parts?
+- UI: colors for different periods of the day. dark at night, yellow/orange before.
+- UI: more height 50%. How make it proportional to viewport?
+- UI: less space above
+- UI: timer not move.
+
 ## 2024-03-26
 
 2024-03-26 notes APP TimeLeft

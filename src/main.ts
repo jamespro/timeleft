@@ -385,17 +385,12 @@ function refresh() {
 
 document.querySelector<HTMLDivElement>("#app")!.innerHTML = /* html */ `
   <div class="container">
-    <p>Time Left</p>
-    <div class="card">
-      <div id="timeLeftContainer">
-        <h1 id="timeLeftDisplay">${timeLeftDisplay}</h1>
-      </div>
-      <div id="timeGaugeContainer" style="width: 300px; height: 200px; background-color: #ddd; position: relative;">
+    <p id="appTitle">Time Left</p>
+    <h1 id="timeLeftDisplay">${timeLeftDisplay}</h1>
+    <div id="timeGaugeContainer" style="width: 300px; height: 300px; background-color: #ddd; position: relative;">
       <div id="timeGauge" style="width: 100%; height: ${remainingProportion}%; background-color: #4CAF50; position: absolute; bottom: 0;"></div>
-      </div>
-      <p id="timeText"></p>
-
     </div>
+    <p id="timeText"></p>
   </div>
 `;
 

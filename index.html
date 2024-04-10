@@ -10,9 +10,10 @@
     <div id="outercontainer">
       <div id="app"></div>
       <!--Add buttons to initiate auth sequence and sign out-->
-      <button id="authorize_button" onclick="handleAuthClick()">Authorize</button>
-      <button id="signout_button" onclick="handleSignoutClick()">Sign Out</button>
-      <pre id="content" style="white-space: pre-wrap;"></pre>
+      <div id="auth">
+        <button id="authorize_button" onclick="handleAuthClick()">Authorize</button>
+        <button id="signout_button" onclick="handleSignoutClick()">Sign Out</button>
+      </div>
     </div>
     <script type="module" src="/src/main.ts"></script>
     <script type="text/javascript">
