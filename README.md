@@ -172,6 +172,9 @@ _MAKE AN ARRAY OR DATA STRUCTURE THAT ACCUMULATES THE TIMES, THAT MERGES ANY OVE
 # Future/Maybe
 
 - maybe: show different categories of time in different colors, for example, blue for clear, red for meetings, purple for breaks that might be optional, and have these stacked, so not just your free time
+- DURING EVENT: If we are currently in the middle of an event, and the time left isn't decreasing, show something to indicate this. Text for "in a meeting" or an icon.
+- DURING "Current Event": Also, could countdown the timeleft until end of "current event"
+- NO "Current Event": Add countdown of timeleft until start of next event
 - Tech: Standalone app (Electron? React Native?)
 - Be able to have as a component on a separate dashboard
 - Different layouts?

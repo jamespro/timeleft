@@ -75,9 +75,10 @@ function getPeriodStart(
   // console.log(startTimes);
   const closestPastTime = startTimes.reduce((acc, startTime) => {
     // If startTime is before nowTime and after the current closest time, update acc
+    // If comparing to -1, then the first will be before the second
     if (
-      Temporal.PlainTime.compare(startTime, nowTime) === -1 &&
-      Temporal.PlainTime.compare(startTime, acc) === 1
+      Temporal.PlainTime.compare(startTime, nowTime) < 0 &&
+      Temporal.PlainTime.compare(acc, startTime) < 0
     ) {
       return startTime;
     }
@@ -100,9 +101,10 @@ function getPeriodEnd(
   // Find the closest future time to "nowTime"
   const closestFutureTime = endTimes.reduce((acc, endTime) => {
     // If endTime is after nowTime and before the current closest time, update acc
+    // If comparing to -1, then the first will be before the second
     if (
-      Temporal.PlainTime.compare(endTime, nowTime) === 1 &&
-      Temporal.PlainTime.compare(endTime, acc) === -1
+      Temporal.PlainTime.compare(nowTime, endTime) < 0 &&
+      Temporal.PlainTime.compare(endTime, acc) < 0
     ) {
       return endTime;
     }
