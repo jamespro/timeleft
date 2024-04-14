@@ -56,6 +56,7 @@ console.info(`now time zone ID: ${nowTimeZone}`);
 
 let periodStart = periods.day.start;
 let periodEnd = periods.day.end;
+let periodColor = periods.day.color;
 
 // 3. Pass the current period start and end times into the functions to calculate the next period start and end times.
 
@@ -119,8 +120,32 @@ function getPeriodEnd(
 // Update periodEnd to the closest FUTURE time
 periodEnd = getPeriodEnd(nowTime, endTimes);
 
+// Get the periodColor which is the color of the period which the time is in
+function getPeriodColor(
+  nowTime: Temporal.PlainTime,
+  periodColors: { start: Temporal.PlainTime; color: string }[]
+) {
+  // Find the most recently passed start time to "nowTime" and return the color of the period
+  let periodColor = "";
+  for (let i = 0; i <= periodColors.length; i++) {
+    if (Temporal.PlainTime.compare(periodColors[i].start, nowTime) < 0) {
+      periodColor = periodColors[i].color;
+    } else {
+      return periodColor;
+    }
+  }
+  return periodColor;
+}
+
+const periodColors = Object.values(periods).map((period) => ({
+  start: period.start,
+  color: period.color,
+}));
+periodColor = getPeriodColor(nowTime, periodColors);
+
 console.warn(`periodStart: ${periodStart.toString()}`);
 console.warn(`periodEnd: ${periodEnd.toString()}`);
+console.warn(`periodColor: ${periodColor.toString()}`);
 
 function getPeriodTotalDuration(
   periodStart: Temporal.PlainTime,
@@ -285,8 +310,6 @@ function getPeriodAvailableDuration(
   let mergedEvents = mergeEvents(clippedEvents);
 
   // so now we have "mergedEvents" that can be used to calculate the unavailable time as a Temporal.Duration
-
-  // loop through mergedEvents to calculate the unavailable time as a Temporal.Duration; default value is 0 as a Duration
   let unavailableTime = mergedEvents.reduce(
     (acc, event) => {
       // console.log(Temporal.PlainTime.compare(nowTime, event.end));
@@ -339,17 +362,13 @@ function refresh() {
     }
 
     // console.log("refreshing...");
-    // let periodStart = getPeriodStart(nowTime, startTimes); //don't need to get a new periodStart?
+    let periodStart = getPeriodStart(nowTime, startTimes);
     let periodEnd = getPeriodEnd(nowTime, endTimes);
+    let periodColor = getPeriodColor(nowTime, periodColors);
     const periodTotalDuration = getPeriodTotalDuration(periodStart, periodEnd);
     // *
     // console.log("periodTotalDuration: " + periodTotalDuration.toString());
 
-    // const periodRemainingDuration = getPeriodRemainingDuration(
-    //   nowTime,
-    //   periodEnd
-    // );
-    // NOTE: DEBUG
     // console.log("inside refresh:");
     // console.log(eventsData);
     const periodAvailableDuration = getPeriodAvailableDuration(
@@ -357,9 +376,15 @@ function refresh() {
       periodEnd,
       eventsData
     );
+
     // *
     // console.log(
     //   "periodAvailableDuration: " + periodAvailableDuration.toString()
+    // );
+
+    // const periodRemainingDuration = getPeriodRemainingDuration(
+    //   nowTime,
+    //   periodEnd
     // );
     document.getElementById("timeLeftDisplay")!.innerHTML = formatDuration(
       periodAvailableDuration
@@ -372,13 +397,17 @@ function refresh() {
       100;
     const gauge = document.getElementById("timeGauge");
     gauge!.style.height = remainingProportion + "%";
+    //FIXME: adding color to period -- new function to get current color? or do we now get period start, end and color at the same time?
+    let gaugeColor = "#4CAF50";
+    gaugeColor = periodColor;
+
     if (
       remainingProportion < 4 ||
       Temporal.Duration.from(periodAvailableDuration).total("minutes") < 10
     ) {
       gauge!.style.backgroundColor = "#990000";
     } else {
-      gauge!.style.backgroundColor = "#4CAF50";
+      gauge!.style.backgroundColor = gaugeColor;
     }
 
     refresh();
