@@ -57,6 +57,7 @@ console.info(`now time zone ID: ${nowTimeZone}`);
 let periodStart = periods.day.start;
 let periodEnd = periods.day.end;
 let periodColor = periods.day.color;
+let periodName = periods.day.name;
 
 // 3. Pass the current period start and end times into the functions to calculate the next period start and end times.
 
@@ -142,6 +143,29 @@ const periodColors = Object.values(periods).map((period) => ({
   color: period.color,
 }));
 periodColor = getPeriodColor(nowTime, periodColors);
+
+// Get the periodName which is the Name of the period which the time is in
+function getPeriodName(
+  nowTime: Temporal.PlainTime,
+  periodNames: { start: Temporal.PlainTime; name: string }[]
+) {
+  // Find the most recently passed start time to "nowTime" and return the name of the period
+  let periodName = "";
+  for (let i = 0; i <= periodNames.length; i++) {
+    if (Temporal.PlainTime.compare(periodNames[i].start, nowTime) < 0) {
+      periodName = periodNames[i].name;
+    } else {
+      return periodName;
+    }
+  }
+  return periodName;
+}
+
+const periodNames = Object.values(periods).map((period) => ({
+  start: period.start,
+  name: period.name,
+}));
+periodName = getPeriodName(nowTime, periodNames);
 
 console.warn(`periodStart: ${periodStart.toString()}`);
 console.warn(`periodEnd: ${periodEnd.toString()}`);
@@ -402,8 +426,8 @@ function refresh() {
     gaugeColor = periodColor;
 
     if (
-      remainingProportion < 4 ||
-      Temporal.Duration.from(periodAvailableDuration).total("minutes") < 10
+      remainingProportion < 10 ||
+      Temporal.Duration.from(periodAvailableDuration).total("minutes") < 44
     ) {
       gauge!.style.backgroundColor = "#990000";
     } else {
@@ -421,6 +445,7 @@ document.querySelector<HTMLDivElement>("#app")!.innerHTML = /* html */ `
     <div id="timeGaugeContainer" style="width: 300px; height: 300px; background-color: #ddd; position: relative;">
       <div id="timeGauge" style="width: 100%; height: ${remainingProportion}%; background-color: #4CAF50; position: absolute; bottom: 0;"></div>
     </div>
+    <p id="periodName">${periodName}</p>
     <p id="timeText"></p>
   </div>
 `;
